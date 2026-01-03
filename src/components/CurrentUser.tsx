@@ -1,12 +1,10 @@
 import AvatarWithStoryIndicator from "@/components/AvatarWithStoryIndicator";
-import { Session } from "@/lib/auth-client";
+import { currentUserQueryOptions } from "@/query-options";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
-type Props = {
-  user: Session["user"];
-};
-
-export default function CurrentUser({ user }: Props) {
+export default function CurrentUser() {
+  const { data: user } = useSuspenseQuery(currentUserQueryOptions());
   return (
     <div className="flex w-full items-center gap-2">
       <div className="flex flex-1 basis-0 items-center justify-start gap-3">

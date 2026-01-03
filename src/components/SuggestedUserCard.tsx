@@ -52,8 +52,8 @@ const SuggestedUserCard = ({ user }: Props) => {
         />
         <div className="max-w-37.5 overflow-hidden text-sm">
           <Link
-            // to={`/${user.username}`}
-            to="/"
+            to={"/$username"}
+            params={{ username: user.username }}
             className="overflow-hidden font-medium text-ellipsis whitespace-pre-line"
           >
             {user.username}

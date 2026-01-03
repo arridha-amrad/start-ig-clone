@@ -1,10 +1,16 @@
 import SuggestedUserCard from "@/components/SuggestedUserCard";
-import { suggestedUsersQueryOptions } from "@/query-options";
+import {
+  currentUserQueryOptions,
+  suggestedUsersQueryOptions,
+} from "@/query-options";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
 export default function SuggestedUsers() {
-  const { data } = useSuspenseQuery(suggestedUsersQueryOptions());
+  const { data: currentUser } = useSuspenseQuery(currentUserQueryOptions());
+  const { data } = useSuspenseQuery(
+    suggestedUsersQueryOptions(currentUser?.id ?? "")
+  );
 
   return (
     <div className="my-4">
@@ -14,7 +20,6 @@ export default function SuggestedUsers() {
           See All
         </Link>
       </div>
-      {/* {isPending && <Loader2 className="size-5 animate-spin" />} */}
       <div className="space-y-2">
         {data.map((user) => (
           <SuggestedUserCard key={user.id} user={user} />

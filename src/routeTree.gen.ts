@@ -9,27 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RequireAuthRouteImport } from './routes/_requireAuth'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as OptionalAuthRouteImport } from './routes/_optionalAuth'
-import { Route as RequireAuthIndexRouteImport } from './routes/_requireAuth.index'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as OptionalAuthUsernameRouteImport } from './routes/_optionalAuth.$username'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const RequireAuthRoute = RequireAuthRouteImport.update({
-  id: '/_requireAuth',
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OptionalAuthRoute = OptionalAuthRouteImport.update({
   id: '/_optionalAuth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RequireAuthIndexRoute = RequireAuthIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => RequireAuthRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
@@ -58,64 +65,76 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/search': typeof SearchRoute
   '/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/': typeof RequireAuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/explore': typeof ExploreRoute
+  '/search': typeof SearchRoute
   '/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/': typeof RequireAuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_optionalAuth': typeof OptionalAuthRouteWithChildren
-  '/_requireAuth': typeof RequireAuthRouteWithChildren
+  '/explore': typeof ExploreRoute
+  '/search': typeof SearchRoute
   '/_optionalAuth/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
-  '/_requireAuth/': typeof RequireAuthIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
+    | '/explore'
+    | '/search'
     | '/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
-    | '/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
+    | '/explore'
+    | '/search'
     | '/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
-    | '/'
     | '/api/auth/$'
   id:
     | '__root__'
+    | '/'
     | '/_optionalAuth'
-    | '/_requireAuth'
+    | '/explore'
+    | '/search'
     | '/_optionalAuth/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
-    | '/_requireAuth/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   OptionalAuthRoute: typeof OptionalAuthRouteWithChildren
-  RequireAuthRoute: typeof RequireAuthRouteWithChildren
+  ExploreRoute: typeof ExploreRoute
+  SearchRoute: typeof SearchRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -124,11 +143,18 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_requireAuth': {
-      id: '/_requireAuth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof RequireAuthRouteImport
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_optionalAuth': {
@@ -138,12 +164,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OptionalAuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_requireAuth/': {
-      id: '/_requireAuth/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof RequireAuthIndexRouteImport
-      parentRoute: typeof RequireAuthRoute
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/auth/signup': {
       id: '/auth/signup'
@@ -195,21 +221,11 @@ const OptionalAuthRouteWithChildren = OptionalAuthRoute._addFileChildren(
   OptionalAuthRouteChildren,
 )
 
-interface RequireAuthRouteChildren {
-  RequireAuthIndexRoute: typeof RequireAuthIndexRoute
-}
-
-const RequireAuthRouteChildren: RequireAuthRouteChildren = {
-  RequireAuthIndexRoute: RequireAuthIndexRoute,
-}
-
-const RequireAuthRouteWithChildren = RequireAuthRoute._addFileChildren(
-  RequireAuthRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   OptionalAuthRoute: OptionalAuthRouteWithChildren,
-  RequireAuthRoute: RequireAuthRouteWithChildren,
+  ExploreRoute: ExploreRoute,
+  SearchRoute: SearchRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,

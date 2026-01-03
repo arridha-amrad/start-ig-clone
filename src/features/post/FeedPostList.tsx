@@ -1,10 +1,12 @@
 import FeedPostCard from "@/components/FeedPostCard";
-import { feedPostsQueryOptions } from "@/query-options";
+import {
+  currentUserQueryOptions,
+  feedPostsQueryOptions,
+} from "@/query-options";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useRouteContext } from "@tanstack/react-router";
 
 export const FeedPosts = () => {
-  const { currentUser } = useRouteContext({ from: "/_requireAuth/" });
+  const { data: currentUser } = useSuspenseQuery(currentUserQueryOptions());
   const { data: posts } = useSuspenseQuery(
     feedPostsQueryOptions(currentUser?.id)
   );

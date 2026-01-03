@@ -35,12 +35,11 @@ import DialogLogout from "./DialogLogout";
 import MySwitch from "./Switch";
 import { InstagramIcon, InstagramText } from "./svg/Instagram";
 import { setThemeServerFn } from "@/features/theme";
+import { useQuery } from "@tanstack/react-query";
+import { currentUserQueryOptions } from "@/query-options";
 
-type SidebarProps = {
-  username?: string;
-};
-
-export const Sidebar = ({ username }: SidebarProps) => {
+export const Sidebar = () => {
+  const { data } = useQuery(currentUserQueryOptions());
   return (
     <aside className="lg:w-72 sticky top-0 flex flex-col h-screen border-r border-foreground/5 px-2 py-8">
       <SidebarBrand />
@@ -76,7 +75,7 @@ export const Sidebar = ({ username }: SidebarProps) => {
           label="Notifications"
         />
         <SidebarLink
-          href={`/${username}`}
+          href={`/${data?.username}`}
           icon={<UserRound className="size-6" />}
           label="Profile"
         />

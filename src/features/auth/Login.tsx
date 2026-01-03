@@ -1,61 +1,74 @@
 "use client";
 
 import DividerOr from "@/components/DividerOr";
-import { PasswordFieldForAuth, TextFieldForAuth } from "@/components/Input";
-import { Button } from "@headlessui/react";
-import { Loader2 } from "lucide-react";
-import { useActionState, useEffect, useState } from "react";
+import { useAppForm } from "@/hooks/form-hook";
+import { authClient } from "@/lib/auth-client";
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { z } from "zod";
 import GithubAuthButton from "./LoginWithGithub";
 import GoogleAuthButton from "./LoginWithGoogle";
-import { Link, useNavigate } from "@tanstack/react-router";
+
+const schema = z.object({
+  email: z.email(),
+  password: z.string().min(1, "password is required"),
+});
 
 export default function FormLogin() {
-  const navigate = useNavigate();
-  const [formState, setFormState] = useState({
-    email: "",
-    password: "",
+  const [error, setError] = useState("");
+
+  const form = useAppForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    } as z.infer<typeof schema>,
+    validators: {
+      onSubmit: schema,
+    },
+    onSubmit: async ({ value: { email, password } }) => {
+      setError("");
+      await authClient.signIn.email(
+        {
+          email,
+          password,
+          rememberMe: true,
+          callbackURL: "/",
+        },
+        {
+          onError({ error }) {
+            setError(error.message);
+          },
+        }
+      );
+    },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({
-      ...formState,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  // useEffect(() => {
-  //   if (state.success) {
-  //     router.replace("/");
-  //   }
-  // }, [state.success]);
-
   return (
-    <fieldset disabled={false}>
-      <div className="mb-4">
-        <p className="text-red-400 text-center text-sm">{""}</p>
-      </div>
-      <form className="w-full space-y-2">
-        <TextFieldForAuth
+    <fieldset disabled={form.state.isSubmitting}>
+      {error && (
+        <div className="mb-4">
+          <p className="text-red-400 text-center text-sm">{error}</p>
+        </div>
+      )}
+      <form
+        className="w-full space-y-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+      >
+        <form.AppField
           name="email"
-          label="Email"
-          onChange={handleChange}
-          value={formState.email}
-          error={""}
+          children={(field) => <field.TextField label="Email" />}
         />
-        <PasswordFieldForAuth
-          name="password"
-          value={formState.password}
-          onChange={handleChange}
-          error={""}
-        />
+        <form.AppField name="password">
+          {(field) => <field.PasswordField />}
+        </form.AppField>
         <div className="mt-4">
-          <Button
-            type="submit"
-            className="disabled:bg-bg-secondary bg-skin-primary mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium"
-          >
-            Login
-            {true && <Loader2 className="size-4 animate-spin" />}
-          </Button>
+          <form.AppForm>
+            <form.SubmitButton label="Sign Up" />
+          </form.AppForm>
         </div>
       </form>
 

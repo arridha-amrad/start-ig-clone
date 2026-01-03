@@ -1,14 +1,16 @@
-import { authMiddleware } from "@/middlewares/auth.middleware";
+import { optionalAuthMiddleware } from "@/middlewares/auth.middleware";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_optionalAuth")({
   server: {
-    middleware: [authMiddleware],
+    middleware: [optionalAuthMiddleware],
   },
-  beforeLoad({ serverContext }) {
-    const user = serverContext?.auth?.user;
-    return {
-      currentUser: user,
-    };
+  beforeLoad: ({ serverContext, context }) => {
+    context?.queryClient.setQueryData(
+      ["current-user"],
+      serverContext?.auth?.user
+    );
   },
+  pendingComponent: () => <div>Loading...</div>,
+  notFoundComponent: () => <div>Not Found</div>,
 });

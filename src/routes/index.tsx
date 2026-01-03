@@ -3,56 +3,45 @@ import { Sidebar } from "@/components/Sidebar";
 import { FeedPosts } from "@/features/post/FeedPostList";
 import StoryList from "@/features/stories/StoryList";
 import SuggestedUsers from "@/features/user/SuggestedUserList";
-import { authMiddleware } from "@/middlewares/auth.middleware";
+import { requireAuthMiddleware } from "@/middlewares/auth.middleware";
 import {
   feedPostsQueryOptions,
   suggestedUsersQueryOptions,
 } from "@/query-options";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 
-export const Route = createFileRoute("/_requireAuth/")({
+export const Route = createFileRoute("/")({
   component: App,
   server: {
-    middleware: [authMiddleware],
+    middleware: [requireAuthMiddleware],
   },
-  beforeLoad: ({ serverContext }) => {
-    const user = serverContext?.auth?.user;
-    console.log(user);
-    if (!user) {
-      throw redirect({ to: "/auth/login" });
-    }
-    return {
-      currentUser: user,
-    };
-  },
-  loader: ({ context }) => {
-    context.queryClient.prefetchQuery(suggestedUsersQueryOptions());
-    context.queryClient.prefetchQuery(
-      feedPostsQueryOptions(context.currentUser?.id)
+  loader: ({ context, serverContext }) => {
+    const currentUser = serverContext?.auth.user;
+    context?.queryClient.prefetchQuery(
+      suggestedUsersQueryOptions(currentUser?.id ?? "")
     );
-    return {
-      currentUser: context.currentUser,
-    };
+    context?.queryClient.prefetchQuery(
+      feedPostsQueryOptions(currentUser?.id ?? "")
+    );
+    context.queryClient.setQueryData(["current-user"], currentUser);
   },
 });
 
 function App() {
-  const { currentUser } = Route.useLoaderData();
   return (
     <div className="flex min-h-screen container mx-auto">
       <Sidebar />
       <main className="flex-1">
         <div className="w-full sm:max-w-157.5 max-w-full mx-auto min-h-screen p-4">
           <StoryList />
-          {/* <FeedPostCard /> */}
           <Suspense fallback={<div>loading...</div>}>
             <FeedPosts />
           </Suspense>
         </div>
       </main>
       <aside className="lg:w-xs flex flex-col h-screen px-2 py-8 sticky top-0">
-        {currentUser && <CurrentUser user={currentUser} />}
+        <CurrentUser />
         <Suspense fallback={<div>Loading...</div>}>
           <SuggestedUsers />
         </Suspense>

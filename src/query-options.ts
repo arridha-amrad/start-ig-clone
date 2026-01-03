@@ -1,25 +1,34 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchProfile, fetchSuggestedUsers } from "./features/user/query.user";
 import { fetchFeedPosts } from "./features/post/query.post";
+import { fetchCurrentUser } from "./features/auth/query.auth";
 
-export const suggestedUsersQueryOptions = () =>
+export const suggestedUsersQueryOptions = (currentUserId: string) =>
   queryOptions({
     queryKey: ["suggested-users"],
-    queryFn: fetchSuggestedUsers,
+    queryFn: () => fetchSuggestedUsers({ data: { currentUserId } }),
     staleTime: 60 * 60 * 1000,
+    enabled: currentUserId !== "",
   });
 
-export const feedPostsQueryOptions = (currentUserId?: string) =>
+export const feedPostsQueryOptions = (currentUserId: string) =>
   queryOptions({
     queryKey: ["feed-posts"],
-    queryFn: () => fetchFeedPosts(currentUserId ?? ""),
+    queryFn: () => fetchFeedPosts({ data: { currentUserId } }),
     staleTime: 60 * 60 * 1000,
-    enabled: !!currentUserId,
+    enabled: currentUserId !== "",
   });
 
 export const profileQueryOptions = (username: string) =>
   queryOptions({
     queryKey: ["profile", username],
     queryFn: () => fetchProfile({ data: { username } }),
+    staleTime: 60 * 60 * 1000,
+  });
+
+export const currentUserQueryOptions = () =>
+  queryOptions({
+    queryKey: ["current-user"],
+    queryFn: fetchCurrentUser,
     staleTime: 60 * 60 * 1000,
   });
