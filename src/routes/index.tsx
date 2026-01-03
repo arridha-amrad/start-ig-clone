@@ -32,15 +32,15 @@ function App() {
   return (
     <div className="flex min-h-screen container mx-auto">
       <Sidebar />
-      <main className="flex-1">
-        <div className="w-full sm:max-w-157.5 max-w-full mx-auto min-h-screen p-4">
+      <div className="w-full sm:max-w-157.5 max-w-full mx-auto min-h-screen p-4">
+        <Suspense fallback={<div>loading...</div>}>
           <StoryList />
-          <Suspense fallback={<div>loading...</div>}>
-            <FeedPosts />
-          </Suspense>
-        </div>
-      </main>
-      <aside className="lg:w-xs flex flex-col h-screen px-2 py-8 sticky top-0">
+        </Suspense>
+        <Suspense fallback={<div>loading...</div>}>
+          <FeedPosts />
+        </Suspense>
+      </div>
+      <aside className="w-xs hidden xl:flex flex-col min-h-screen px-2 py-8 sticky top-0">
         <CurrentUser />
         <Suspense fallback={<div>Loading...</div>}>
           <SuggestedUsers />

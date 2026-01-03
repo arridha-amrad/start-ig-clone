@@ -1,4 +1,4 @@
-import Profile from "@/components/ProfileInfo";
+import ProfileCard from "@/components/profile-route/ProfileCard";
 import { Sidebar } from "@/components/Sidebar";
 import { currentUserQueryOptions, profileQueryOptions } from "@/query-options";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -29,8 +29,8 @@ function RouteComponent() {
     <div className="flex min-h-screen container mx-auto">
       <Sidebar />
       <main className="flex-1">
-        <div className="w-full sm:max-w-157.5 max-w-full mx-auto min-h-screen p-4">
-          <Profile />
+        <div className="w-full border min-h-screen p-4">
+          <ProfileCard />
         </div>
       </main>
     </div>

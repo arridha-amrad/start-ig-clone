@@ -41,7 +41,7 @@ import { currentUserQueryOptions } from "@/query-options";
 export const Sidebar = () => {
   const { data } = useQuery(currentUserQueryOptions());
   return (
-    <aside className="lg:w-72 sticky top-0 flex flex-col h-screen border-r border-foreground/5 px-2 py-8">
+    <aside className="lg:w-72 hidden sticky top-0 md:flex flex-col h-screen border-r border-foreground/5 px-2 py-8">
       <SidebarBrand />
       <div className="px-2 space-y-2 flex-1">
         <SidebarLink
@@ -118,7 +118,9 @@ const SidebarLink = ({ href, icon, label }: Props) => {
       to={href}
     >
       <div className="p-2">{icon}</div>
-      <span className={isActive ? "font-bold" : ""}>{label}</span>
+      <span className={cn(isActive && "font-bold", "lg:block hidden")}>
+        {label}
+      </span>
     </Link>
   );
 };

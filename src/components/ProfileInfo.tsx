@@ -7,7 +7,7 @@ import { Link, useParams } from "@tanstack/react-router";
 import ProfileSettings from "./ProfileSettings";
 import ButtonFollow from "./ButtonFolloe";
 
-export default function Profile() {
+export default function ProfileInfo() {
   const { username } = useParams({ from: "/_optionalAuth/$username" });
 
   const { data: profile } = useSuspenseQuery(profileQueryOptions(username));
@@ -18,19 +18,9 @@ export default function Profile() {
   //   isAuthUser || !profile.isProtected || profile.isFollowed;
 
   return (
-    <section className="mt-10 flex flex-col sm:grid sm:grid-cols-3 md:mt-0">
-      <div className="flex items-center justify-start px-4 sm:justify-center">
-        {isAuthUser ? (
-          <AvatarEditable />
-        ) : (
-          <AvatarWithStoryIndicator
-            isStoryExists={false}
-            isStoryWatched={false}
-            size={150}
-            avatarUrl={profile?.image ?? "/default.jpg"}
-          />
-        )}
-      </div>
+    <section className="flex flex-col sm:grid sm:grid-cols-3">
+      {/* <div className="flex items-center justify-start px-4 sm:justify-center"></div> */}
+      <ProfileAvatar avatarUrl={profile?.image} isMe={isAuthUser} />
       <div className="mt-4 px-4 sm:col-span-2 sm:mt-0 sm:px-0">
         <div className="flex items-center gap-4">
           <h1 className="text-xl">{profile?.username}</h1>
@@ -113,5 +103,24 @@ const ProfilePostFollowersFollowings = ({
       <p className="font-semibold">{total}</p>
       <p className="text-foreground/70">{label}</p>
     </div>
+  );
+};
+
+const ProfileAvatar = ({
+  avatarUrl,
+  isMe,
+}: {
+  isMe: boolean;
+  avatarUrl?: string | null;
+}) => {
+  return isMe ? (
+    <AvatarEditable />
+  ) : (
+    <AvatarWithStoryIndicator
+      isStoryExists={false}
+      isStoryWatched={false}
+      size={150}
+      avatarUrl={avatarUrl ?? "/default.jpg"}
+    />
   );
 };

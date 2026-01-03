@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as SettingsRouteImport } from './routes/_settings'
 import { Route as OptionalAuthRouteImport } from './routes/_optionalAuth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
@@ -27,6 +28,10 @@ const SearchRoute = SearchRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/_settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OptionalAuthRoute = OptionalAuthRouteImport.update({
@@ -88,6 +93,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_optionalAuth': typeof OptionalAuthRouteWithChildren
+  '/_settings': typeof SettingsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
   '/_optionalAuth/$username': typeof OptionalAuthUsernameRoute
@@ -121,6 +127,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_optionalAuth'
+    | '/_settings'
     | '/explore'
     | '/search'
     | '/_optionalAuth/$username'
@@ -133,6 +140,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OptionalAuthRoute: typeof OptionalAuthRouteWithChildren
+  SettingsRoute: typeof SettingsRoute
   ExploreRoute: typeof ExploreRoute
   SearchRoute: typeof SearchRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -155,6 +163,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_settings': {
+      id: '/_settings'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_optionalAuth': {
@@ -224,6 +239,7 @@ const OptionalAuthRouteWithChildren = OptionalAuthRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OptionalAuthRoute: OptionalAuthRouteWithChildren,
+  SettingsRoute: SettingsRoute,
   ExploreRoute: ExploreRoute,
   SearchRoute: SearchRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,

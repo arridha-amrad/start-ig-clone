@@ -29,9 +29,9 @@ const EditableAvatar = () => {
   };
 
   return (
-    <form className="group relative size-[166px] cursor-pointer">
-      {true && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/50">
+    <div className="group relative w-max cursor-pointer">
+      {false && (
+        <div className="absolute flex items-center justify-center inset-0 z-20 rounded-full bg-black/50">
           <Loader2 className="size-6 animate-spin" />
         </div>
       )}
@@ -56,7 +56,7 @@ const EditableAvatar = () => {
         avatarUrl={currAvatar}
       />
       <button hidden type="submit" ref={btnRef}></button>
-    </form>
+    </div>
   );
 };
 
