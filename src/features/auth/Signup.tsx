@@ -1,32 +1,55 @@
-"use client";
-
-import { PasswordFieldForAuth, TextFieldForAuth } from "@/components/Input";
-import { Button } from "@headlessui/react";
-import GoogleAuthButton from "./LoginWithGoogle";
-import GithubAuthButton from "./LoginWithGithub";
 import DividerOr from "@/components/DividerOr";
-import { useActionState, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
 import { InstagramText } from "@/components/svg/Instagram";
+import { useAppForm } from "@/hooks/form-hook";
+import { authClient } from "@/lib/auth-client";
+import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { z } from "zod";
+import GithubAuthButton from "./LoginWithGithub";
+import GoogleAuthButton from "./LoginWithGoogle";
 
-const initState = {
-  message: "",
-};
+const schema = z.object({
+  email: z.email(),
+  password: z.string().min(5, "password too short"),
+  username: z.string().min(1, "username is required"),
+  fullname: z.string().min(1, "fullname is required"),
+});
 
 export default function FormSignup() {
-  const [formState, setFormState] = useState({
-    username: "",
-    email: "",
-    password: "",
-    fullname: "",
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+
+  const form = useAppForm({
+    defaultValues: {
+      fullname: "",
+      email: "",
+      password: "",
+      username: "",
+    } as z.infer<typeof schema>,
+    validators: {
+      onSubmit: schema,
+    },
+    onSubmit: async ({ value: { email, fullname, password, username } }) => {
+      setError("");
+      setMessage("");
+      await authClient.signUp.email(
+        {
+          email,
+          name: fullname,
+          password,
+          username,
+        },
+        {
+          onError({ error }) {
+            setError(error.message);
+          },
+          onSuccess: () => {
+            setMessage("Check your email for verification");
+          },
+        }
+      );
+    },
   });
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormState({
-      ...formState,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   return (
     <fieldset disabled={false}>
@@ -42,37 +65,41 @@ export default function FormSignup() {
           <GithubAuthButton />
         </div>
         <DividerOr />
-        {/* {!!state.message && (
+        {!!error && (
           <div className="mb-4">
-            <p className="text-center text-xs font-light text-green-500">
-              {state.message}
+            <p className="text-center text-xs font-light text-red-500">
+              {error}
             </p>
           </div>
-        )} */}
-        <form className="w-full space-y-2">
-          <TextFieldForAuth
-            name="email"
-            label="Email"
-            value={formState.email}
-            onChange={handleChange}
-          />
-          <PasswordFieldForAuth
-            onChange={handleChange}
-            name="password"
-            value={formState.password}
-          />
-          <TextFieldForAuth
-            onChange={handleChange}
+        )}
+        {!!message && (
+          <div className="mb-4">
+            <p className="text-center text-xs font-light text-green-500">
+              {message}
+            </p>
+          </div>
+        )}
+        <form
+          className="w-full space-y-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <form.AppField
             name="fullname"
-            label="Fullname"
-            value={formState.fullname}
+            children={(field) => <field.TextField label="Fullname" />}
           />
-          <TextFieldForAuth
-            onChange={handleChange}
-            name="username"
-            label="Username"
-            value={formState.username}
-          />
+          <form.AppField name="email">
+            {(field) => <field.TextField label="Email" />}
+          </form.AppField>
+          <form.AppField name="password">
+            {(field) => <field.PasswordField />}
+          </form.AppField>
+          <form.AppField name="username">
+            {(field) => <field.TextField label="Username" />}
+          </form.AppField>
           <div className="mt-4">
             <p className="text-center text-xs font-light text-foreground/50">
               People who use our service may have uploaded your contact
@@ -85,15 +112,10 @@ export default function FormSignup() {
               Policy .
             </p>
           </div>
-
           <div className="mt-4">
-            <Button
-              type="submit"
-              className="disabled:bg-bg-secondary bg-skin-primary mt-2 flex w-full items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium"
-            >
-              Sign Up
-              {true && <Loader2 className="size-4 animate-spin" />}
-            </Button>
+            <form.AppForm>
+              <form.SubmitButton label="Sign Up" />
+            </form.AppForm>
           </div>
         </form>
       </div>

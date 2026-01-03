@@ -1,12 +1,9 @@
-const e = import.meta.env
-
 export const env = {
-  baseUrl: e.NEXT_PUBLIC_BASE_URL,
-  dbUrl: e.DB_URL,
-  githubClientId: e.GITHUB_CLIENT_ID,
-  githubClientSecret: e.GITHUB_CLIENT_SECRET,
-  googleClientId: e.GOOGLE_CLIENT_ID,
-  googleClientSecret: e.GOOGLE_CLIENT_SECRET,
-  googleRefreshToken: e.GOOGLE_REFRESH_TOKEN,
-  googleUser: e.GOOGLE_USER,
+  dbUrl: process.env.DB_URL,
+  githubClientId: process.env.GITHUB_CLIENT_ID,
+  githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
+  googleClientId: process.env.GOOGLE_CLIENT_ID,
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  googleRefreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+  googleUser: process.env.GOOGLE_USER,
 };

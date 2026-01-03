@@ -1,14 +1,21 @@
 import { cn } from "@/utils";
 import { Button, Field, Input, Label } from "@headlessui/react";
 import { Eye, EyeOff } from "lucide-react";
-import { InputHTMLAttributes, useId, useState } from "react";
+import { InputHTMLAttributes, ReactNode, useId, useState } from "react";
 
 type Props = {
+  children: ReactNode;
   error?: string;
   label: string;
 } & InputHTMLAttributes<HTMLInputElement>;
 
-export function TextFieldForAuth({ label, onChange, error, ...props }: Props) {
+export function TextFieldForAuth({
+  label,
+  onChange,
+  children,
+  error,
+  ...props
+}: Props) {
   const id = useId();
   const [isFocus, setIsFocus] = useState(false);
   return (
@@ -37,7 +44,8 @@ export function TextFieldForAuth({ label, onChange, error, ...props }: Props) {
           )}
         />
       </div>
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {children}
+      {/* {error && <p className="text-xs text-red-400">{error}</p>} */}
     </Field>
   );
 }

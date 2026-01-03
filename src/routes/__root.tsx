@@ -11,8 +11,8 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
 
 import type { QueryClient } from "@tanstack/react-query";
-import { getThemeServerFn } from "@/features/Theme";
 import { useEffect } from "react";
+import { getThemeServerFn, setThemeServerFn } from "@/features/theme";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -52,6 +52,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         "(prefers-color-scheme: dark)"
       ).matches;
       document.documentElement.classList.toggle("dark", isDeviceDark);
+      setThemeServerFn({ data: isDeviceDark ? "dark" : "light" });
     }
   }, []);
 

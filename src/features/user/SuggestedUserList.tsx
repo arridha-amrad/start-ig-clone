@@ -1,22 +1,11 @@
 import SuggestedUserCard from "@/components/SuggestedUserCard";
+import { suggestedUsersQueryOptions } from "@/query-options";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
-// const fetchSuggestedUsers = async () => {
-//   const result = await db.query.user.findMany({
-//     limit: 5,
-//     columns: {
-//       id: true,
-//       username: true,
-//       name: true,
-//       image: true,
-//     },
-//   });
-//   return result;
-// };
-
 export default function SuggestedUsers() {
-  // const users = await fetchSuggestedUsers();
-  const users: any[] = [];
+  const { data } = useSuspenseQuery(suggestedUsersQueryOptions());
+
   return (
     <div className="my-4">
       <div className="flex items-center justify-between mb-2">
@@ -25,8 +14,9 @@ export default function SuggestedUsers() {
           See All
         </Link>
       </div>
+      {/* {isPending && <Loader2 className="size-5 animate-spin" />} */}
       <div className="space-y-2">
-        {users.map((user) => (
+        {data.map((user) => (
           <SuggestedUserCard key={user.id} user={user} />
         ))}
       </div>

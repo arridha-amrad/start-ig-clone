@@ -34,7 +34,7 @@ import { HTMLAttributes, ReactNode, useEffect, useState } from "react";
 import DialogLogout from "./DialogLogout";
 import MySwitch from "./Switch";
 import { InstagramIcon, InstagramText } from "./svg/Instagram";
-import { setThemeServerFn } from "@/features/Theme";
+import { setThemeServerFn } from "@/features/theme";
 
 type SidebarProps = {
   username?: string;

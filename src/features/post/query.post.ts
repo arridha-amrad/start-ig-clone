@@ -1,0 +1,33 @@
+import { sql } from "drizzle-orm";
+import db from "@/db";
+
+export const fetchFeedPosts = async (currentUserId: string) => {
+  const posts = await db.query.post.findMany({
+    limit: 10,
+    orderBy: (post, { desc }) => [desc(post.createdAt)],
+    with: {
+      owner: {
+        columns: {
+          name: true,
+          image: true,
+          id: true,
+          username: true,
+        },
+      },
+      media: true,
+    },
+    extras: {
+      totalLikes:
+        sql<number>`(select count(*) from "post_like" where "post_like"."post_id" = "post"."id")`.as(
+          "likes_count"
+        ),
+      isLiked:
+        sql<boolean>`(select exists(select 1 from "post_like" where "post_like"."post_id" = "post"."id" and "post_like"."user_id" = ${currentUserId}))`.as(
+          "is_liked"
+        ),
+    },
+  });
+  return posts;
+};
+
+export type TFeedPost = Awaited<ReturnType<typeof fetchFeedPosts>>[number];
