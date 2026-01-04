@@ -26,6 +26,9 @@ export const auth = betterAuth({
     },
     sendOnSignUp: true,
     async afterEmailVerification(user) {
+      await db.insert(schema.userAdditionalInfo).values({
+        userId: user.id,
+      });
       await db
         .update(schema.user)
         .set({ verifiedAt: new Date() })

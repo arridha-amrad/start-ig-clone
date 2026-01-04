@@ -28,6 +28,43 @@ export const user = pgTable("user", {
   isProtected: boolean("is_protected").default(false).notNull(),
   verifiedAt: timestamp("verified_at"),
 });
+export const userRelations = relations(user, ({ many, one }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  additionalInfo: one(userAdditionalInfo),
+}));
+
+export const genderEnum = pgEnum("gender_options_enum", [
+  "-",
+  "female",
+  "male",
+]);
+export const userAdditionalInfo = pgTable("user_additional_info", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .unique()
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  gender: genderEnum("gender").notNull().default("-"),
+  website: text("website"),
+  bio: text("bio"),
+  isShowThreadBadge: boolean("is_show_thread_badge").default(false),
+  isShowAccountSuggestion: boolean("is_show_account_suggestion").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+export const userAdditionalInfoRelation = relations(
+  userAdditionalInfo,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userAdditionalInfo.userId],
+      references: [user.id],
+    }),
+  })
+);
 
 export const session = pgTable(
   "session",
@@ -148,11 +185,6 @@ export const postLikeRelations = relations(postLike, ({ one }) => ({
 }));
 
 // ================== RELATIONS ===============
-
-export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
-}));
 
 export const sessionRelations = relations(session, ({ one }) => ({
   user: one(user, {

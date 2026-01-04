@@ -1,0 +1,1 @@
+ALTER TABLE "user_additional_info" ALTER COLUMN "updated_at" SET DEFAULT now();

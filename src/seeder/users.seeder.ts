@@ -32,6 +32,21 @@ const main = async () => {
   await Promise.all(promises);
 };
 
-main()
+// main()
+//   .then(() => console.log("done"))
+//   .catch((e) => console.error(e));
+
+const addUserAdditionalInfo = async () => {
+  const users = await db.query.user.findMany();
+  const promises = users.map(async (user) => {
+    await db
+      .insert(schema.userAdditionalInfo)
+      .values({ userId: user.id })
+      .onConflictDoNothing();
+  });
+  await Promise.all(promises);
+};
+
+addUserAdditionalInfo()
   .then(() => console.log("done"))
   .catch((e) => console.error(e));

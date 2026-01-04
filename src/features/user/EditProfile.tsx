@@ -1,46 +1,70 @@
-import { useState } from "react";
-import { ChevronDown, PencilIcon } from "lucide-react";
 import { FooterAuth } from "@/components/FooterAuth";
+import { currentUserQueryOptions, profileQueryOptions } from "@/query-options";
 import {
-  Menu,
   Input,
+  Menu,
   MenuButton,
   MenuItem,
   MenuItems,
-  Field,
-  Label,
-  RadioGroup,
   Radio,
+  RadioGroup,
 } from "@headlessui/react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { CheckIcon, ChevronDown } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
 
 const EditProfile = () => {
-  const [bio, setBio] = useState("");
-  const [threadsBadge, setThreadsBadge] = useState(true);
-  const [suggestions, setSuggestions] = useState(false);
+  const { data: currentUser } = useSuspenseQuery(currentUserQueryOptions());
+  const { data: profile } = useSuspenseQuery(
+    profileQueryOptions(currentUser?.username ?? "")
+  );
+
+  const info = profile?.additionalInfo;
+  const [bio, setBio] = useState(info?.bio ?? "");
+  const [website, setWebsite] = useState(info?.website ?? "");
+  const [threadsBadge, setThreadsBadge] = useState(
+    info?.isShowThreadBadge ?? false
+  );
+  const [suggestions, setSuggestions] = useState(
+    info?.isShowAccountSuggestion ?? false
+  );
+
+  const [gender, setGender] = useState(info?.gender ?? "-");
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log({
+      bio,
+      website,
+      threadsBadge,
+      suggestions,
+      gender,
+    });
+  };
 
   return (
     <div className="min-h-screen py-8">
-      <div className="max-w-[630px] mx-auto space-y-8">
+      <form className="max-w-[630px] mx-auto space-y-8" onSubmit={handleSubmit}>
         <h1 className="text-xl font-bold">Edit profile</h1>
         {/* Section: Profile Header */}
-        <div className="bg-foreground/5 rounded-2xl p-4 flex items-center justify-between">
+        <div className="bg-foreground/10 rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-14 h-14 rounded-full bg-linear-to-tr from-yellow-400 to-purple-600 p-[2px]">
-              <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-black">
+              <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-background">
                 {/* Placeholder Image */}
                 <img
-                  src="https://via.placeholder.com/150"
+                  src={profile?.image ?? "/default.jpg"}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
               </div>
             </div>
             <div>
-              <p className="font-bold text-sm">amrad2108</p>
-              <p className="text-gray-400 text-sm">amrad</p>
+              <p className="font-bold text-sm">{profile?.username}</p>
+              <p className="text-gray-400 text-sm">{profile?.name}</p>
             </div>
           </div>
-          <button className="bg-blue-500 hover:bg-blue-400 px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors">
+          <button className="bg-blue-500 hover:bg-blue-400 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors">
             Change photo
           </button>
         </div>
@@ -49,6 +73,8 @@ const EditProfile = () => {
         <div className="space-y-2">
           <label className="block font-bold text-sm">Website</label>
           <Input
+            value={website}
+            onChange={(e) => setWebsite(e.target.value)}
             placeholder="website"
             className="w-full text-sm py-2.5 bg-foreground/5 px-4 rounded-xl focus:ring-foreground/50 outline-0 border border-foreground/15 focus:ring"
           />
@@ -87,23 +113,8 @@ const EditProfile = () => {
           </div>
         </div>
 
-        {/* Section: Gender */}
-        <DropDownGender />
-        <Example />
-        {/* <div className="space-y-2">
-          <label className="block font-bold text-sm">Gender</label>
-          <div className="relative">
-            <div className="border border-foreground/15 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:border-gray-500 transition-colors">
-              <span className="text-sm">Prefer not to say</span>
-              <DropDownGender />
-            </div>
-          </div>
-          <p className="text-[11px] text-gray-500">
-            This won't be part of your public profile.
-          </p>
-        </div> */}
+        <Gender setValue={(v: any) => setGender(v)} value={gender} />
 
-        {/* Section: Account Suggestions */}
         <div className="space-y-3">
           <label className="block font-bold text-sm">
             Show account suggestions on profiles
@@ -129,7 +140,7 @@ const EditProfile = () => {
         {/* Footer Text */}
         <p className="text-xs text-foreground/50 text-center px-4">
           Certain profile info, like your name, bio and links, is visible to
-          everyone.{" "}
+          everyone.
           <a href="#" className="text-[#0095f6] hover:underline">
             See what profile info is visible
           </a>
@@ -144,7 +155,7 @@ const EditProfile = () => {
             Submit
           </button>
         </div>
-      </div>
+      </form>
       <div className="w-full mt-8">
         <FooterAuth />
       </div>
@@ -174,9 +185,27 @@ const Toggle = ({
   </button>
 );
 
-function DropDownGender() {
+function Gender({
+  value,
+  setValue,
+}: {
+  value: string;
+  setValue: (v: string) => void;
+}) {
   const gender = ["male", "female", "prefer not to say"];
-  let [selected, setSelected] = useState(gender[0]);
+  let [selected, setSelected] = useState(gender[2]);
+
+  useEffect(() => {
+    setValue(selected);
+  }, [selected]);
+
+  useEffect(() => {
+    if (value === "-") {
+      setSelected(gender[2]);
+    } else {
+      setSelected(value);
+    }
+  }, [value]);
 
   return (
     <Menu as="div" className="relative">
@@ -185,7 +214,7 @@ function DropDownGender() {
           <label className="block font-bold text-sm">Gender</label>
           <div className="relative">
             <div className="border border-foreground/15 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-foreground/5 transition-colors">
-              <span className="text-sm">Prefer not to say</span>
+              <span className="text-sm">{selected}</span>
               <ChevronDown />
             </div>
           </div>
@@ -194,55 +223,37 @@ function DropDownGender() {
           </p>
         </div>
       </MenuButton>
-      <MenuItems anchor="bottom end">
+      <MenuItems
+        anchor="bottom end"
+        className="-mt-8 p-1 bg-background border rounded-xl border-foreground/10 shadow"
+      >
         <RadioGroup
           value={selected}
           onChange={setSelected}
           aria-label="Server size"
         >
           {gender.map((plan) => (
-            <MenuItem as="div" key={plan} className="flex items-center gap-2">
+            <MenuItem
+              as="div"
+              key={plan}
+              className="w-full origin-top-right text-sm/6 transition duration-100 ease-out focus:outline-none data-closed:scale-95 data-closed:opacity-0"
+            >
               <Radio
                 value={plan}
-                className="group flex size-5 items-center justify-center rounded-full border bg-white data-checked:bg-blue-400"
+                className="group relative hover:bg-foreground/10 rounded-xl flex cursor-pointer w-full shadow-md p-4 transition data-focus:outline outline-none"
               >
-                <span className="invisible size-2 rounded-full bg-white group-data-checked:visible" />
+                <div className="flex w-full items-center justify-between">
+                  <div className="text-sm pr-4">
+                    <p className="font-semibold">{plan}</p>
+                  </div>
+                  <CheckIcon className="size-6 opacity-0 transition group-data-checked:opacity-100" />
+                </div>
               </Radio>
-              <Label>{plan}</Label>
             </MenuItem>
           ))}
         </RadioGroup>
       </MenuItems>
     </Menu>
-  );
-}
-
-function Example() {
-  return (
-    <div className="">
-      <Menu as={"div"}>
-        <MenuButton className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white data-hover:bg-gray-700 data-open:bg-gray-700">
-          Options
-          <ChevronDown className="size-4 fill-white/60" />
-        </MenuButton>
-
-        <MenuItems
-          transition
-          anchor="bottom end"
-          className="w-52 origin-top-right rounded-xl border border-white/5 bg-white/5 p-1 text-sm/6 text-white transition duration-100 ease-out [--anchor-gap:--spacing(1)] focus:outline-none data-closed:scale-95 data-closed:opacity-0"
-        >
-          <MenuItem>
-            <button className="group flex w-full items-center gap-2 rounded-lg px-3 py-1.5 data-focus:bg-white/10">
-              <PencilIcon className="size-4 fill-white/30" />
-              Edit
-              <kbd className="ml-auto hidden font-sans text-xs text-white/50 group-data-focus:inline">
-                ⌘E
-              </kbd>
-            </button>
-          </MenuItem>
-        </MenuItems>
-      </Menu>
-    </div>
   );
 }
 
