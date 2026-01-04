@@ -1,6 +1,6 @@
 import { FooterAuth } from "@/components/FooterAuth";
 import { InstagramText } from "@/components/svg/Instagram";
-import FormLogin from "@/features/auth/login";
+import FormLogin from "@/features/auth/Login";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/auth/login")({

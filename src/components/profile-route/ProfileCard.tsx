@@ -1,7 +1,7 @@
 import { profileQueryOptions } from "@/query-options";
 import { Button } from "@headlessui/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   BadgeCheck,
   Link as LinkIcon,
@@ -13,6 +13,8 @@ export default function InstagramProfile() {
   const { username } = useParams({ from: "/_optionalAuth/$username" });
   const { data: profile } = useSuspenseQuery(profileQueryOptions(username));
   const isMe = username === profile?.username;
+
+  const navigate = useNavigate();
 
   return (
     <div className="bg-background text-foreground p-6 max-w-[610px] mx-auto">
@@ -71,7 +73,10 @@ export default function InstagramProfile() {
       {/* Action Buttons */}
       <div className="flex gap-2">
         {isMe ? (
-          <Button className="flex-1 bg-blue-500 transition-colors py-2.5 rounded-xl font-semibold text-sm">
+          <Button
+            onClick={() => navigate({ to: "/settings" })}
+            className="flex-1 bg-blue-500 transition-colors py-2.5 rounded-xl font-semibold text-sm"
+          >
             Edit Profile
           </Button>
         ) : (

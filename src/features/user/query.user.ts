@@ -30,9 +30,17 @@ export const fetchProfile = createServerFn()
     })
   )
   .handler(async ({ data: { username } }) => {
-    return db.query.user.findFirst({
-      where: (user, { eq }) => eq(user.username, username),
-    });
+    try {
+      const profile = db.query.user.findFirst({
+        where: (user, { eq }) => eq(user.username, username),
+      });
+      if (!profile) {
+        throw new Error("Profile not found");
+      }
+      return profile;
+    } catch (err) {
+      throw new Error("Something went wrong");
+    }
   });
 
 export type TProfile = Awaited<ReturnType<typeof fetchProfile>>;

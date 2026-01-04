@@ -3,22 +3,24 @@ import { Sidebar } from "@/components/Sidebar";
 import { currentUserQueryOptions, profileQueryOptions } from "@/query-options";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
+import z from "zod";
 
 export const Route = createFileRoute("/_optionalAuth/$username")({
-  component: RouteComponent,
-  loader: async ({ params: { username }, context: { queryClient } }) => {
-    try {
-      const profile = await queryClient.ensureQueryData(
-        profileQueryOptions(username)
-      );
-      if (!profile) {
-        throw notFound();
-      }
-      return profile;
-    } catch (err) {
+  params: {
+    parse: (params) => ({
+      username: z.string().parse(params.username),
+    }),
+  },
+  beforeLoad: ({ params }) => {
+    const systemPaths = [".well-known", "api", "static"];
+    if (systemPaths.includes(params.username)) {
       throw notFound();
     }
   },
+  loader: async ({ params: { username }, context: { queryClient } }) => {
+    await queryClient.ensureQueryData(profileQueryOptions(username));
+  },
+  component: RouteComponent,
 });
 
 function RouteComponent() {

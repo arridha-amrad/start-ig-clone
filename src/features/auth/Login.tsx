@@ -1,5 +1,3 @@
-"use client";
-
 import DividerOr from "@/components/DividerOr";
 import { useAppForm } from "@/hooks/form-hook";
 import { authClient } from "@/lib/auth-client";
@@ -67,7 +65,7 @@ export default function FormLogin() {
         </form.AppField>
         <div className="mt-4">
           <form.AppForm>
-            <form.SubmitButton label="Sign Up" />
+            <form.SubmitButton label="Login" />
           </form.AppForm>
         </div>
       </form>

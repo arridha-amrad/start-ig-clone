@@ -9,17 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ExploreRouteImport } from './routes/explore'
-import { Route as SettingsRouteImport } from './routes/_settings'
 import { Route as OptionalAuthRouteImport } from './routes/_optionalAuth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings.index'
+import { Route as SettingsNotificationRouteImport } from './routes/settings.notification'
 import { Route as AuthSignupRouteImport } from './routes/auth.signup'
 import { Route as AuthLoginRouteImport } from './routes/auth.login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as OptionalAuthUsernameRouteImport } from './routes/_optionalAuth.$username'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -30,10 +37,6 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/_settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OptionalAuthRoute = OptionalAuthRouteImport.update({
   id: '/_optionalAuth',
   getParentRoute: () => rootRouteImport,
@@ -42,6 +45,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsNotificationRoute = SettingsNotificationRouteImport.update({
+  id: '/notification',
+  path: '/notification',
+  getParentRoute: () => SettingsRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
@@ -73,10 +86,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/settings/notification': typeof SettingsNotificationRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -87,19 +103,23 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/settings/notification': typeof SettingsNotificationRoute
+  '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_optionalAuth': typeof OptionalAuthRouteWithChildren
-  '/_settings': typeof SettingsRoute
   '/explore': typeof ExploreRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/_optionalAuth/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/settings/notification': typeof SettingsNotificationRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -108,10 +128,13 @@ export interface FileRouteTypes {
     | '/'
     | '/explore'
     | '/search'
+    | '/settings'
     | '/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
+    | '/settings/notification'
+    | '/settings/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -122,27 +145,31 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
+    | '/settings/notification'
+    | '/settings'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/_optionalAuth'
-    | '/_settings'
     | '/explore'
     | '/search'
+    | '/settings'
     | '/_optionalAuth/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
+    | '/settings/notification'
+    | '/settings/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OptionalAuthRoute: typeof OptionalAuthRouteWithChildren
-  SettingsRoute: typeof SettingsRoute
   ExploreRoute: typeof ExploreRoute
   SearchRoute: typeof SearchRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -151,6 +178,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -163,13 +197,6 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_settings': {
-      id: '/_settings'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_optionalAuth': {
@@ -185,6 +212,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/notification': {
+      id: '/settings/notification'
+      path: '/notification'
+      fullPath: '/settings/notification'
+      preLoaderRoute: typeof SettingsNotificationRouteImport
+      parentRoute: typeof SettingsRoute
     }
     '/auth/signup': {
       id: '/auth/signup'
@@ -236,12 +277,26 @@ const OptionalAuthRouteWithChildren = OptionalAuthRoute._addFileChildren(
   OptionalAuthRouteChildren,
 )
 
+interface SettingsRouteChildren {
+  SettingsNotificationRoute: typeof SettingsNotificationRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsNotificationRoute: SettingsNotificationRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OptionalAuthRoute: OptionalAuthRouteWithChildren,
-  SettingsRoute: SettingsRoute,
   ExploreRoute: ExploreRoute,
   SearchRoute: SearchRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
