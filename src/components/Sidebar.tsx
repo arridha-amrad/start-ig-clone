@@ -1,3 +1,6 @@
+import { setThemeServerFn } from "@/features/theme";
+import { authClient } from "@/lib/auth-client";
+import { currentUserQueryOptions } from "@/query-options";
 import { cn } from "@/utils";
 import {
   autoUpdate,
@@ -10,7 +13,8 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { Button } from "@headlessui/react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   ActivityIcon,
   BellIcon,
@@ -30,13 +34,16 @@ import {
   Video,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { HTMLAttributes, ReactNode, useEffect, useState } from "react";
+import {
+  HTMLAttributes,
+  ReactNode,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
 import DialogLogout from "./DialogLogout";
 import MySwitch from "./Switch";
 import { InstagramIcon, InstagramText } from "./svg/Instagram";
-import { setThemeServerFn } from "@/features/theme";
-import { useQuery } from "@tanstack/react-query";
-import { currentUserQueryOptions } from "@/query-options";
 
 export const Sidebar = () => {
   const { data } = useQuery(currentUserQueryOptions());
@@ -138,6 +145,7 @@ const ButtonCreatePost = () => {
 };
 
 function MoreOptions() {
+  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     open,
@@ -157,13 +165,26 @@ function MoreOptions() {
   ]);
 
   const [openTheme, setOpenTheme] = useState(false);
-  // const { theme } = useTheme();
 
-  // const [isPending, startTransition] = useTransition();
-  // const router = useRouter();
-  const logout = async () => {};
+  const [isPending, startTransition] = useTransition();
 
-  // const t = useTranslations("Sidebar");
+  const navigate = useNavigate();
+  const logout = async () => {
+    try {
+      const result = await authClient.signOut();
+      qc.clear();
+      if (result.data?.success) {
+        startTransition(async () => {
+          navigate({ to: "/auth/login", replace: true });
+        });
+      } else {
+        console.log(result.error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       <Button
@@ -243,15 +264,13 @@ function MoreOptions() {
           </FloatingPortal>
         )}
       </AnimatePresence>
-      <DialogLogout open={false} />
+      <DialogLogout open={isPending} />
     </>
   );
 }
 
 export function SwitchTheme() {
   const [isDark, setIsDark] = useState(false);
-
-  // const { setTheme, theme } = useTheme();
 
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains("dark");
