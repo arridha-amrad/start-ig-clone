@@ -57,6 +57,13 @@
       "when": 1767523410330,
       "tag": "0007_glorious_stephen_strange",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1767617242655,
+      "tag": "0008_abandoned_doctor_doom",
+      "breakpoints": true
     }
   ]
 }

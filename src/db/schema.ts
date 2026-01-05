@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -9,6 +9,8 @@ import {
   unique,
   pgEnum,
   integer,
+  primaryKey,
+  check,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -32,6 +34,41 @@ export const userRelations = relations(user, ({ many, one }) => ({
   sessions: many(session),
   accounts: many(account),
   additionalInfo: one(userAdditionalInfo),
+  // Orang-orang yang diikuti oleh user ini
+  following: many(follows, { relationName: "following" }),
+  // Orang-orang yang mengikuti user ini (pengikut)
+  followers: many(follows, { relationName: "followers" }),
+}));
+
+export const follows = pgTable(
+  "follows",
+  {
+    followerId: text("follower_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    followingId: text("following_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    // // 1. Composite Primary Key: avoid duplication of follow-data
+    primaryKey({ columns: [table.followerId, table.followingId] }),
+    // // 2. Check Constraint: prevent user from follow itself
+    check("no_self_follow", sql`${table.followerId} <> ${table.followingId}`),
+  ]
+);
+export const followsRelations = relations(follows, ({ one }) => ({
+  follower: one(user, {
+    fields: [follows.followerId],
+    references: [user.id],
+    relationName: "following",
+  }),
+  following: one(user, {
+    fields: [follows.followingId],
+    references: [user.id],
+    relationName: "followers",
+  }),
 }));
 
 export const genderEnum = pgEnum("gender_options_enum", [

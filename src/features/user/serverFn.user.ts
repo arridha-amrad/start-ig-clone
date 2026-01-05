@@ -2,7 +2,7 @@ import db from "@/db";
 import * as schema from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
-import { eq, ne, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import { requireAuthMiddleware } from "@/middlewares/auth.middleware";
 
 export const fetchSuggestedUsers = createServerFn()
@@ -88,4 +88,44 @@ export const updateProfile = createServerFn()
     } catch (error) {
       throw error;
     }
+  });
+
+export const follow = createServerFn()
+  .inputValidator(
+    z.object({
+      userId: z.string(),
+    })
+  )
+  .middleware([requireAuthMiddleware])
+  .handler(async ({ context, data: { userId } }) => {
+    const {
+      auth: { user },
+    } = context;
+    return db.transaction(async (tx) => {
+      const existingFollow = await tx.query.follows.findFirst({
+        where: (table, { eq, and }) =>
+          and(eq(table.followerId, user.id), eq(table.followingId, userId)),
+      });
+      if (existingFollow) {
+        // unfollow
+        await db
+          .delete(schema.follows)
+          .where(
+            and(
+              eq(schema.follows.followerId, user.id),
+              eq(schema.follows.followingId, userId)
+            )
+          );
+        return {
+          follow: false,
+        };
+      }
+      await db.insert(schema.follows).values({
+        followerId: user.id,
+        followingId: userId,
+      });
+      return {
+        follow: true,
+      };
+    });
   });
