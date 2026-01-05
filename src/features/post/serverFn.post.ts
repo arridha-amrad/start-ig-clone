@@ -1,7 +1,50 @@
-import { sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import db from "@/db";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireAuthMiddleware } from "@/middlewares/auth.middleware";
+import { postLike } from "@/db/schema";
+
+export const likePost = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      postId: z.string(),
+    })
+  )
+  .middleware([requireAuthMiddleware])
+  .handler(
+    async ({
+      context: {
+        auth: { user },
+      },
+      data: { postId },
+    }) => {
+      try {
+        return await db.transaction(async (tx) => {
+          const existingLike = await tx.query.postLike.findFirst({
+            where: (postLike, { eq, and }) =>
+              and(eq(postLike.postId, postId), eq(postLike.userId, user.id)),
+          });
+          if (existingLike) {
+            await tx
+              .delete(postLike)
+              .where(
+                and(eq(postLike.postId, postId), eq(postLike.userId, user.id))
+              );
+            return { liked: false };
+          }
+          await tx.insert(postLike).values({
+            userId: user.id,
+            postId: postId,
+          });
+          return { liked: true };
+        });
+      } catch (err) {
+        console.error(err);
+        throw new Error("Something went wrong");
+      }
+    }
+  );
 
 export const fetchFeedPosts = createServerFn()
   .inputValidator(
@@ -12,7 +55,7 @@ export const fetchFeedPosts = createServerFn()
   .handler(async ({ data: { currentUserId } }) => {
     const posts = await db.query.post.findMany({
       limit: 10,
-      orderBy: (post, { desc }) => [desc(post.createdAt)],
+      orderBy: ({ createdAt }, { desc }) => desc(createdAt),
       with: {
         owner: {
           columns: {

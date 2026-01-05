@@ -12,6 +12,7 @@ import VerifiedAccountIndicator from "./VerifiedAccountIndicator";
 import { EmblaCarouselType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
+import { useLikePostMutation } from "@/hooks/mutations/post-hook";
 
 type Props = {
   post: TFeedPost;
@@ -112,28 +113,24 @@ function Comment({ post }: { post: TFeedPost }) {
 }
 
 function Like({ post }: { post: TFeedPost }) {
-  const [liked, setLiked] = useState(post.isLiked);
-  const [totalLikes, setTotalLikes] = useState(Number(post.totalLikes));
+  const { mutate } = useLikePostMutation(post.id);
 
   return (
     <div className="flex items-center gap-x-2">
       <Heart
         onClick={() => {
-          setLiked((val) => {
-            return !val;
-          });
-          if (liked) {
-            setTotalLikes((v) => v - 1);
-          } else {
-            setTotalLikes((v) => v + 1);
-          }
+          mutate();
         }}
         className={cn(
           "size-6 cursor-pointer",
-          liked ? "fill-rose-500 text-rose-500" : "hover:text-foreground/80"
+          post.isLiked
+            ? "fill-rose-500 text-rose-500"
+            : "hover:text-foreground/80"
         )}
       />
-      <p className="text-sm font-semibold">{totalLikes}</p>
+      {post.totalLikes > 0 && (
+        <p className="text-sm font-semibold">{post.totalLikes}</p>
+      )}
     </div>
   );
 }

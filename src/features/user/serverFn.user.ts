@@ -2,7 +2,7 @@ import db from "@/db";
 import * as schema from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import z from "zod";
-import { eq, ne } from "drizzle-orm";
+import { eq, ne, sql } from "drizzle-orm";
 import { requireAuthMiddleware } from "@/middlewares/auth.middleware";
 
 export const fetchSuggestedUsers = createServerFn()
@@ -36,6 +36,12 @@ export const fetchProfile = createServerFn()
         where: (user, { eq }) => eq(user.username, username),
         with: {
           additionalInfo: true,
+        },
+        extras: {
+          totalPosts:
+            sql<number>`(select count("post"."id") from "post" where "post"."user_id" = "user"."id")`.as(
+              "total_posts"
+            ),
         },
       });
       if (!profile) {

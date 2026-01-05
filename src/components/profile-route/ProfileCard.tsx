@@ -1,4 +1,4 @@
-import { profileQueryOptions } from "@/query-options";
+import { currentUserQueryOptions, profileQueryOptions } from "@/query-options";
 import { Button } from "@headlessui/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "@tanstack/react-router";
@@ -11,8 +11,9 @@ import {
 
 export default function ProfileCard() {
   const { username } = useParams({ from: "/_optionalAuth/$username" });
+  const { data: currentUser } = useSuspenseQuery(currentUserQueryOptions());
   const { data: profile } = useSuspenseQuery(profileQueryOptions(username));
-  const isMe = username === profile?.username;
+  const isMe = currentUser?.username === profile?.username;
 
   const navigate = useNavigate();
 
@@ -41,7 +42,7 @@ export default function ProfileCard() {
           <h2 className="font-light text-sm">{profile?.name}</h2>
           <div className="flex gap-6 text-sm my-4 md:text-base">
             <div>
-              <span className="font-bold">65</span> posts
+              <span className="font-bold">{profile?.totalPosts}</span> posts
             </div>
             <div>
               <span className="font-bold">106K</span> followers

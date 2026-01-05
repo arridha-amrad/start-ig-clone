@@ -115,6 +115,7 @@ const SidebarLink = ({ href, icon, label }: Props) => {
         "flex items-center text-xl p-1.5 font-medium hover:bg-foreground/10 gap-2 lg:pr-4 w-max rounded-xl",
         isActive && "bg-foreground/10"
       )}
+      preload={false}
       to={href}
     >
       <div className="p-2">{icon}</div>
