@@ -40,7 +40,7 @@ function App() {
           <FeedPosts />
         </Suspense>
       </div>
-      <aside className="w-xs hidden xl:flex flex-col min-h-screen px-2 py-8 sticky top-0">
+      <aside className="w-xs hidden xl:flex flex-col h-screen px-2 py-8 sticky top-0">
         <CurrentUser />
         <Suspense fallback={<div>Loading...</div>}>
           <SuggestedUsers />

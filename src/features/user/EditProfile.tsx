@@ -9,9 +9,15 @@ import {
   Radio,
   RadioGroup,
 } from "@headlessui/react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { CheckIcon, ChevronDown } from "lucide-react";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
+import toast from "react-hot-toast";
+import { TGender, updateProfile } from "./serverFn.user";
 
 const EditProfile = () => {
   const { data: currentUser } = useSuspenseQuery(currentUserQueryOptions());
@@ -29,27 +35,59 @@ const EditProfile = () => {
     info?.isShowAccountSuggestion ?? false
   );
 
-  const [gender, setGender] = useState(info?.gender ?? "-");
+  const [gender, setGender] = useState<TGender>(info?.gender ?? "-");
+
+  const qc = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: () =>
+      updateProfile({
+        data: {
+          bio,
+          website,
+          showThreadsBadge: threadsBadge,
+          showAccountSuggestions: suggestions,
+          gender,
+        },
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({
+        queryKey: ["profile", profile!.username],
+      });
+      toast.success("Profile updated successfully");
+    },
+    onError: (error) => {
+      try {
+        const validationErrors = JSON.parse(error.message);
+        if (Array.isArray(validationErrors)) {
+          validationErrors.forEach((err) => {
+            toast.error(`${err.path[0]}: ${err.message}`);
+          });
+        } else {
+          toast.error(error.message);
+        }
+      } catch (e) {
+        toast.error(error.message || "An unexpected error occurred");
+      }
+    },
+  });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({
-      bio,
-      website,
-      threadsBadge,
-      suggestions,
-      gender,
-    });
+    mutate();
   };
 
   return (
     <div className="min-h-screen py-8">
-      <form className="max-w-[630px] mx-auto space-y-8" onSubmit={handleSubmit}>
+      <form
+        className="max-w-157.5 w-full mx-auto space-y-8"
+        onSubmit={handleSubmit}
+      >
         <h1 className="text-xl font-bold">Edit profile</h1>
         {/* Section: Profile Header */}
         <div className="bg-foreground/10 rounded-2xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-linear-to-tr from-yellow-400 to-purple-600 p-[2px]">
+            <div className="w-14 h-14 rounded-full bg-linear-to-tr from-yellow-400 to-purple-600 p-0.5">
               <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-background">
                 {/* Placeholder Image */}
                 <img
@@ -150,7 +188,7 @@ const EditProfile = () => {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-400 w-full max-w-[200px] py-2.5 rounded-xl text-sm font-semibold cursor-not-allowed"
+            className="bg-blue-500 hover:bg-blue-400 w-full max-w-50 py-2.5 rounded-xl text-sm font-semibold cursor-not-allowed"
           >
             Submit
           </button>
@@ -192,20 +230,7 @@ function Gender({
   value: string;
   setValue: (v: string) => void;
 }) {
-  const gender = ["male", "female", "prefer not to say"];
-  let [selected, setSelected] = useState(gender[2]);
-
-  useEffect(() => {
-    setValue(selected);
-  }, [selected]);
-
-  useEffect(() => {
-    if (value === "-") {
-      setSelected(gender[2]);
-    } else {
-      setSelected(value);
-    }
-  }, [value]);
+  const gender = ["male", "female", "-"];
 
   return (
     <Menu as="div" className="relative">
@@ -214,7 +239,9 @@ function Gender({
           <label className="block font-bold text-sm">Gender</label>
           <div className="relative">
             <div className="border border-foreground/15 rounded-xl p-4 flex items-center justify-between cursor-pointer hover:bg-foreground/5 transition-colors">
-              <span className="text-sm">{selected}</span>
+              <span className="text-sm">
+                {value === "-" ? "prefer not to say" : value}
+              </span>
               <ChevronDown />
             </div>
           </div>
@@ -227,24 +254,22 @@ function Gender({
         anchor="bottom end"
         className="-mt-8 p-1 bg-background border rounded-xl border-foreground/10 shadow"
       >
-        <RadioGroup
-          value={selected}
-          onChange={setSelected}
-          aria-label="Server size"
-        >
-          {gender.map((plan) => (
+        <RadioGroup value={value} onChange={setValue} aria-label="Server size">
+          {gender.map((g) => (
             <MenuItem
               as="div"
-              key={plan}
+              key={g}
               className="w-full origin-top-right text-sm/6 transition duration-100 ease-out focus:outline-none data-closed:scale-95 data-closed:opacity-0"
             >
               <Radio
-                value={plan}
+                value={g}
                 className="group relative hover:bg-foreground/10 rounded-xl flex cursor-pointer w-full shadow-md p-4 transition data-focus:outline outline-none"
               >
                 <div className="flex w-full items-center justify-between">
                   <div className="text-sm pr-4">
-                    <p className="font-semibold">{plan}</p>
+                    <p className="font-semibold">
+                      {g === "-" ? "Prefer not to say" : g}
+                    </p>
                   </div>
                   <CheckIcon className="size-6 opacity-0 transition group-data-checked:opacity-100" />
                 </div>

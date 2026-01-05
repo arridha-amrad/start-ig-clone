@@ -9,7 +9,7 @@ import {
   UserPlus,
 } from "lucide-react";
 
-export default function InstagramProfile() {
+export default function ProfileCard() {
   const { username } = useParams({ from: "/_optionalAuth/$username" });
   const { data: profile } = useSuspenseQuery(profileQueryOptions(username));
   const isMe = username === profile?.username;
@@ -17,7 +17,7 @@ export default function InstagramProfile() {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-background text-foreground p-6 max-w-[610px] mx-auto">
+    <div className="bg-background text-foreground p-6 w-full  sm:max-w-152.5 mx-auto">
       {/* Header Section: Avatar & Stats */}
       <div className="flex items-center gap-8 mb-6">
         {/* Avatar dengan Border Ring */}
@@ -39,7 +39,7 @@ export default function InstagramProfile() {
             <MoreHorizontal className="ml-2 w-6 h-6 cursor-pointer" />
           </div>
           <h2 className="font-light text-sm">{profile?.name}</h2>
-          <div className="flex gap-6 text-sm mt-2 md:text-base">
+          <div className="flex gap-6 text-sm my-4 md:text-base">
             <div>
               <span className="font-bold">65</span> posts
             </div>
@@ -50,23 +50,19 @@ export default function InstagramProfile() {
               <span className="font-bold">53</span> following
             </div>
           </div>
-          {/* OCCUPATION */}
-          <div className="mt-4">
-            <p className="text-foreground/70 text-sm">Software Engineer</p>
-          </div>
           {/* BIO */}
-          <div className="text-sm">
-            PCOS | Fertilite | Hormonlar 💡 Evidence-Based Diyet ✨ Beslenme
-            tedavisi ile hormonlarınızı yönetmenize yardımcı oluyorum. 📍
-            Serdivan / Sakarya
+          <div className="text-sm whitespace-break-spaces">
+            {profile?.additionalInfo?.bio}
           </div>
           {/* WEBSITE */}
-          <div className="flex text-sm items-center gap-1 text-blue-400 font-medium pt-1">
-            <LinkIcon className="w-4 h-4 -rotate-45" />
-            <a href="#" className="hover:underline">
-              diyetisyenhale.com
-            </a>
-          </div>
+          {profile?.additionalInfo?.website && (
+            <div className="flex text-sm items-center gap-1 text-blue-400 font-medium pt-1">
+              <LinkIcon className="w-4 h-4 -rotate-45" />
+              <a href="#" className="hover:underline">
+                {profile?.additionalInfo?.website}
+              </a>
+            </div>
+          )}
         </div>
       </div>
 

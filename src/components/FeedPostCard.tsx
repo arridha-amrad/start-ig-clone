@@ -1,4 +1,4 @@
-import { TFeedPost } from "@/features/post/query.post";
+import { TFeedPost } from "@/features/post/serverFn.post";
 import { cn } from "@/utils";
 import {
   Bookmark,

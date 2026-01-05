@@ -39,3 +39,20 @@ export const fetchFeedPosts = createServerFn()
   });
 
 export type TFeedPost = Awaited<ReturnType<typeof fetchFeedPosts>>[number];
+
+export const fetchUserPosts = createServerFn()
+  .inputValidator(
+    z.object({
+      userId: z.string(),
+    })
+  )
+  .handler(async ({ data: { userId } }) => {
+    const posts = await db.query.post.findMany({
+      with: {
+        media: true,
+      },
+      where: (post, { eq }) => eq(post.userId, userId),
+    });
+    return posts;
+  });
+export type TUserPost = Awaited<ReturnType<typeof fetchUserPosts>>[number];
