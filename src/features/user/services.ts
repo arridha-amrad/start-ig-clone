@@ -34,10 +34,10 @@ export const fetchProfile = createServerFn()
   .handler(async ({ data: { username }, context: { auth } }) => {
     const currUserId = auth?.user?.id;
     const isFollowing = currUserId
-      ? sql<boolean>`false`
-      : sql<boolean>`exists (select 1 from "follows" where "follows"."follower_id" = ${currUserId} and "follows"."following_id" = "user"."id")`;
+      ? sql<boolean>`exists (select 1 from "follows" where "follows"."follower_id" = ${currUserId} and "follows"."following_id" = "user"."id")`
+      : sql<boolean>`false`;
     try {
-      const profile = db.query.user.findFirst({
+      const profile = await db.query.user.findFirst({
         where: (user, { eq }) => eq(user.username, username),
         with: {
           additionalInfo: true,

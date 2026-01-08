@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchProfile, fetchSuggestedUsers } from "./services";
 
-const userKeys = {
+export const userKeys = {
   suggestedUsers: "suggested-user",
   profile: (username: string) => ["profile", username],
 };
@@ -15,7 +15,7 @@ export const suggestedUsers = queryOptions({
 
 export const profile = (username: string) =>
   queryOptions({
-    queryKey: [userKeys.profile(username)],
+    queryKey: userKeys.profile(username),
     queryFn: () => fetchProfile({ data: { username } }),
     staleTime: 60 * 60 * 1000,
   });

@@ -8,7 +8,7 @@ export const useLikePostMutation = (postId: string) => {
     mutationFn: () => likePost({ data: { postId } }),
     onMutate: async () => {
       await qc.cancelQueries({ queryKey: [postKeys.feedPosts] });
-      const prevFeedPosts = qc.getQueryData<TFeedPost[]>(postKeys.feedPosts);
+      const prevFeedPosts = qc.getQueryData<TFeedPost[]>([postKeys.feedPosts]);
       qc.setQueryData([postKeys.feedPosts], (old: TFeedPost[]) => {
         return old.map((post) =>
           post.id !== postId
@@ -22,7 +22,6 @@ export const useLikePostMutation = (postId: string) => {
               }
         );
       });
-
       return {
         prevFeedPosts,
       };
@@ -30,6 +29,12 @@ export const useLikePostMutation = (postId: string) => {
     onError: (_, __, mutateResult) => {
       const oldFeedPosts = mutateResult?.prevFeedPosts;
       qc.setQueryData([postKeys.feedPosts], oldFeedPosts);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({
+        queryKey: [postKeys.feedPosts],
+        refetchType: "none",
+      });
     },
   });
 };

@@ -1,37 +1,22 @@
-import { Sidebar } from "@/components/Sidebar";
 import CurrentUser from "@/features/auth/components/CurrentUser";
-import { authKeys, me } from "@/features/auth/queries";
 import { FeedPosts } from "@/features/post/components/FeedPostList";
 import { feedPosts } from "@/features/post/queries";
 import StoryList from "@/features/stories/StoryList";
 import SuggestedUsers from "@/features/user/components/SuggestedUserList";
 import { suggestedUsers } from "@/features/user/queries";
-import { requireAuthMiddleware } from "@/middlewares/auth.middleware";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_mustAuth/")({
   component: App,
-  server: {
-    middleware: [requireAuthMiddleware],
-  },
-  loader: ({ context, serverContext }) => {
-    const currentUser = serverContext?.auth.user;
-    context?.queryClient.ensureQueryData(suggestedUsers);
-    context?.queryClient.ensureQueryData(feedPosts);
-    context.queryClient.setQueryData([authKeys.currentUser], currentUser);
-    return {
-      currentUser,
-    };
+  loader: ({ context: { queryClient } }) => {
+    queryClient.ensureQueryData(suggestedUsers);
+    queryClient.ensureQueryData(feedPosts);
   },
 });
-
 function App() {
-  const { data: currentUser } = useSuspenseQuery(me);
   return (
-    <div className="flex min-h-screen container max-w-[1280px] mx-auto">
-      {currentUser && <Sidebar username={currentUser.username} />}
+    <>
       <div className="w-full sm:max-w-157.5 max-w-full mx-auto min-h-screen p-4">
         <Suspense fallback={<div>loading...</div>}>
           <StoryList />
@@ -47,7 +32,7 @@ function App() {
         </Suspense>
         <Footer />
       </aside>
-    </div>
+    </>
   );
 }
 

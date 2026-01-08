@@ -9,7 +9,7 @@ export default function UserPostList() {
   const { data: profile } = useSuspenseQuery(profileQueryOptions(username));
   const { data: posts } = useSuspenseQuery(userPosts(profile?.id ?? ""));
   return (
-    <div className="grid w-full max-w-4xl mx-auto grid-cols-4 gap-2">
+    <div className="grid w-full max-w-4xl mx-auto grid-cols-4 gap-1">
       {posts?.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}

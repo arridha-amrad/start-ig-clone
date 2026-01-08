@@ -1,18 +1,12 @@
 import { TFeedPost } from "@/features/post/services";
 import { cn } from "@/utils";
-import {
-  Bookmark,
-  Heart,
-  MessageCircle,
-  MoreHorizontal,
-  Send,
-} from "lucide-react";
+import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import VerifiedAccountIndicator from "./VerifiedAccountIndicator";
-
+import { FeedPostLikeButton } from "@/features/post/components/ButtonLike";
 import { EmblaCarouselType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
-import { useLikePostMutation } from "@/features/post/mutations";
+import { formatDistanceToNowStrict } from "date-fns";
 
 type Props = {
   post: TFeedPost;
@@ -30,14 +24,19 @@ export default function FeedPostCard({ post }: Props) {
               <div className="flex items-center gap-1">
                 <span className="text-sm font-semibold">{post.owner.name}</span>
                 <VerifiedAccountIndicator />
-                <span className="text-gray-400 text-sm">• 3h</span>
+                <span className="text-foreground text-sm">
+                  •{" "}
+                  {formatDistanceToNowStrict(new Date(post.createdAt), {
+                    addSuffix: true,
+                  })}
+                </span>
               </div>
-              <p className="text-[11px] text-gray-400 leading-none">
+              <p className="text-[11px] text-foreground/50 leading-none">
                 {post.location}
               </p>
             </div>
           </div>
-          <MoreHorizontal className="w-5 h-5 text-gray-400 cursor-pointer" />
+          <MoreHorizontal className="w-5 h-5 text-foreground cursor-pointer" />
         </div>
         {/* 2. CONTENT */}
         <Carousel post={post} />
@@ -45,11 +44,11 @@ export default function FeedPostCard({ post }: Props) {
         <div className="p-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-4">
-              <Like post={post} />
+              <FeedPostLikeButton post={post} />
               <Comment post={post} />
-              <Send className="w-6 h-6 hover:text-gray-400 cursor-pointer" />
+              <Send className="w-6 h-6 hover:text-foreground cursor-pointer" />
             </div>
-            <Bookmark className="w-6 h-6 hover:text-gray-400 cursor-pointer" />
+            <Bookmark className="w-6 h-6 hover:text-foreground cursor-pointer" />
           </div>
           <Caption post={post} />
         </div>
@@ -108,29 +107,6 @@ function Comment({ post }: { post: TFeedPost }) {
     <div className="flex items-center gap-x-2">
       <MessageCircle className="w-6 h-6 hover:text-gray-400 cursor-pointer" />
       {/* <p className="text-sm">{post.totalComments as string}</p> */}
-    </div>
-  );
-}
-
-function Like({ post }: { post: TFeedPost }) {
-  const { mutate } = useLikePostMutation(post.id);
-
-  return (
-    <div className="flex items-center gap-x-2">
-      <Heart
-        onClick={() => {
-          mutate();
-        }}
-        className={cn(
-          "size-6 cursor-pointer",
-          post.isLiked
-            ? "fill-rose-500 text-rose-500"
-            : "hover:text-foreground/80"
-        )}
-      />
-      {post.totalLikes > 0 && (
-        <p className="text-sm font-semibold">{post.totalLikes}</p>
-      )}
     </div>
   );
 }

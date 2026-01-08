@@ -43,7 +43,7 @@ export default function Stories() {
     <div ref={emblaRef} className="relative w-full group overflow-hidden px-1">
       <div className="flex touch-pan-y touch-pinch-zoom">
         {Array.from({ length: 30 }, (_, i) => i).map((index) => (
-          <div key={index} className="min-w-0 flex-[0_0_calc(100%/6)]">
+          <div key={index} className="min-w-0 pl-4 flex-[0_0_calc(100%/6)]">
             <StoryAvatar />
           </div>
         ))}

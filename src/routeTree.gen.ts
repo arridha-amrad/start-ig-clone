@@ -9,29 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as OptionalAuthRouteImport } from './routes/_optionalAuth'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as MustAuthRouteRouteImport } from './routes/_mustAuth/route'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as MustAuthIndexRouteImport } from './routes/_mustAuth/index'
 import { Route as SettingsNotificationRouteImport } from './routes/settings/notification'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as OptionalAuthUsernameRouteImport } from './routes/_optionalAuth.$username'
+import { Route as MustAuthSearchRouteImport } from './routes/_mustAuth/search'
+import { Route as MustAuthExploreRouteImport } from './routes/_mustAuth/explore'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExploreRoute = ExploreRouteImport.update({
-  id: '/explore',
-  path: '/explore',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const OptionalAuthRoute = OptionalAuthRouteImport.update({
   id: '/_optionalAuth',
   getParentRoute: () => rootRouteImport,
@@ -41,15 +32,19 @@ const SettingsRouteRoute = SettingsRouteRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const MustAuthRouteRoute = MustAuthRouteRouteImport.update({
+  id: '/_mustAuth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SettingsRouteRoute,
+} as any)
+const MustAuthIndexRoute = MustAuthIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MustAuthRouteRoute,
 } as any)
 const SettingsNotificationRoute = SettingsNotificationRouteImport.update({
   id: '/notification',
@@ -76,6 +71,16 @@ const OptionalAuthUsernameRoute = OptionalAuthUsernameRouteImport.update({
   path: '/$username',
   getParentRoute: () => OptionalAuthRoute,
 } as any)
+const MustAuthSearchRoute = MustAuthSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => MustAuthRouteRoute,
+} as any)
+const MustAuthExploreRoute = MustAuthExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => MustAuthRouteRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -83,49 +88,49 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/settings': typeof SettingsRouteRouteWithChildren
-  '/explore': typeof ExploreRoute
-  '/search': typeof SearchRoute
+  '/explore': typeof MustAuthExploreRoute
+  '/search': typeof MustAuthSearchRoute
   '/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/settings/notification': typeof SettingsNotificationRoute
+  '/': typeof MustAuthIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/explore': typeof ExploreRoute
-  '/search': typeof SearchRoute
+  '/explore': typeof MustAuthExploreRoute
+  '/search': typeof MustAuthSearchRoute
   '/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/settings/notification': typeof SettingsNotificationRoute
+  '/': typeof MustAuthIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_mustAuth': typeof MustAuthRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/_optionalAuth': typeof OptionalAuthRouteWithChildren
-  '/explore': typeof ExploreRoute
-  '/search': typeof SearchRoute
+  '/_mustAuth/explore': typeof MustAuthExploreRoute
+  '/_mustAuth/search': typeof MustAuthSearchRoute
   '/_optionalAuth/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/settings/notification': typeof SettingsNotificationRoute
+  '/_mustAuth/': typeof MustAuthIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
     | '/settings'
     | '/explore'
     | '/search'
@@ -134,11 +139,11 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/settings/notification'
+    | '/'
     | '/settings/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/explore'
     | '/search'
     | '/$username'
@@ -146,30 +151,30 @@ export interface FileRouteTypes {
     | '/auth/login'
     | '/auth/signup'
     | '/settings/notification'
+    | '/'
     | '/settings'
     | '/api/auth/$'
   id:
     | '__root__'
-    | '/'
+    | '/_mustAuth'
     | '/settings'
     | '/_optionalAuth'
-    | '/explore'
-    | '/search'
+    | '/_mustAuth/explore'
+    | '/_mustAuth/search'
     | '/_optionalAuth/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
     | '/settings/notification'
+    | '/_mustAuth/'
     | '/settings/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  MustAuthRouteRoute: typeof MustAuthRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   OptionalAuthRoute: typeof OptionalAuthRouteWithChildren
-  ExploreRoute: typeof ExploreRoute
-  SearchRoute: typeof SearchRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -178,20 +183,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/explore': {
-      id: '/explore'
-      path: '/explore'
-      fullPath: '/explore'
-      preLoaderRoute: typeof ExploreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_optionalAuth': {
       id: '/_optionalAuth'
       path: ''
@@ -206,11 +197,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/_mustAuth': {
+      id: '/_mustAuth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof MustAuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -219,6 +210,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/'
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof SettingsRouteRoute
+    }
+    '/_mustAuth/': {
+      id: '/_mustAuth/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof MustAuthIndexRouteImport
+      parentRoute: typeof MustAuthRouteRoute
     }
     '/settings/notification': {
       id: '/settings/notification'
@@ -255,6 +253,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OptionalAuthUsernameRouteImport
       parentRoute: typeof OptionalAuthRoute
     }
+    '/_mustAuth/search': {
+      id: '/_mustAuth/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof MustAuthSearchRouteImport
+      parentRoute: typeof MustAuthRouteRoute
+    }
+    '/_mustAuth/explore': {
+      id: '/_mustAuth/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof MustAuthExploreRouteImport
+      parentRoute: typeof MustAuthRouteRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -264,6 +276,22 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface MustAuthRouteRouteChildren {
+  MustAuthExploreRoute: typeof MustAuthExploreRoute
+  MustAuthSearchRoute: typeof MustAuthSearchRoute
+  MustAuthIndexRoute: typeof MustAuthIndexRoute
+}
+
+const MustAuthRouteRouteChildren: MustAuthRouteRouteChildren = {
+  MustAuthExploreRoute: MustAuthExploreRoute,
+  MustAuthSearchRoute: MustAuthSearchRoute,
+  MustAuthIndexRoute: MustAuthIndexRoute,
+}
+
+const MustAuthRouteRouteWithChildren = MustAuthRouteRoute._addFileChildren(
+  MustAuthRouteRouteChildren,
+)
 
 interface SettingsRouteRouteChildren {
   SettingsNotificationRoute: typeof SettingsNotificationRoute
@@ -292,11 +320,9 @@ const OptionalAuthRouteWithChildren = OptionalAuthRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  MustAuthRouteRoute: MustAuthRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
   OptionalAuthRoute: OptionalAuthRouteWithChildren,
-  ExploreRoute: ExploreRoute,
-  SearchRoute: SearchRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,

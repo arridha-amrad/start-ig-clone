@@ -9,6 +9,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { profile as profileQueryOptions } from "../queries";
+import { ProfileFollowButton } from "./ButtonFollow";
 
 export default function ProfileCard() {
   const { username } = useParams({ from: "/_optionalAuth/$username" });
@@ -79,16 +80,18 @@ export default function ProfileCard() {
             Edit Profile
           </Button>
         ) : (
-          <Button className="flex-1 bg-blue-500 transition-colors py-2.5 rounded-xl font-semibold text-sm">
-            Follow
-          </Button>
+          <ProfileFollowButton
+            isFollowing={profile.isFollowing}
+            userId={profile.id}
+            username={profile.username}
+          />
         )}
-        <button className="flex-1 bg-zinc-800 hover:bg-zinc-700 transition-colors py-2.5 rounded-xl font-semibold text-sm">
+        <Button className="flex-1 bg-foreground/10 hover:bg-foreground/20 transition-colors py-2.5 rounded-xl font-medium text-sm">
           Message
-        </button>
-        <button className="bg-foreground/10 hover:bg-foreground/20 transition-colors w-max px-3 aspect-square rounded-xl">
+        </Button>
+        <Button className="bg-foreground/10 hover:bg-foreground/20 transition-colors w-max px-3 aspect-square rounded-xl">
           <UserPlus className="w-5 h-5" />
-        </button>
+        </Button>
       </div>
     </div>
   );

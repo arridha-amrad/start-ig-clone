@@ -4,6 +4,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAuthMiddleware } from "@/middlewares/auth.middleware";
 import { postLike } from "@/db/schema";
+import { setTimeout } from "timers/promises";
 
 export const likePost = createServerFn({ method: "POST" })
   .inputValidator(
@@ -19,6 +20,7 @@ export const likePost = createServerFn({ method: "POST" })
       },
       data: { postId },
     }) => {
+      await setTimeout(5000);
       try {
         return await db.transaction(async (tx) => {
           const existingLike = await tx.query.postLike.findFirst({
