@@ -7,6 +7,12 @@ import * as schema from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const auth = betterAuth({
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5,
+    },
+  },
   plugins: [tanstackStartCookies()],
   database: drizzleAdapter(db, {
     provider: "pg",

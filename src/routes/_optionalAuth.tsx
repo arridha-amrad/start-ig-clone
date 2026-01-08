@@ -1,3 +1,4 @@
+import { authKeys } from "@/features/auth/queries";
 import { optionalAuthMiddleware } from "@/middlewares/auth.middleware";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -7,7 +8,7 @@ export const Route = createFileRoute("/_optionalAuth")({
   },
   beforeLoad: ({ serverContext, context }) => {
     context?.queryClient.setQueryData(
-      ["current-user"],
+      [authKeys.currentUser],
       serverContext?.auth?.user
     );
   },

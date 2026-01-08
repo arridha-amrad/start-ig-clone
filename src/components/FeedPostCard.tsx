@@ -1,4 +1,4 @@
-import { TFeedPost } from "@/features/post/serverFn.post";
+import { TFeedPost } from "@/features/post/services";
 import { cn } from "@/utils";
 import {
   Bookmark,
@@ -12,7 +12,7 @@ import VerifiedAccountIndicator from "./VerifiedAccountIndicator";
 import { EmblaCarouselType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
-import { useLikePostMutation } from "@/hooks/mutations/post-hook";
+import { useLikePostMutation } from "@/features/post/mutations";
 
 type Props = {
   post: TFeedPost;

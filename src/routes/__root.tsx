@@ -14,6 +14,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { getThemeServerFn, setThemeServerFn } from "@/features/theme";
 import { Toaster } from "react-hot-toast";
+import useThemeListener from "@/hooks/useTheme";
 
 interface MyRouterContext {
   queryClient: QueryClient;
@@ -45,20 +46,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const theme = Route.useLoaderData();
-
-  useEffect(() => {
-    if (typeof theme === "undefined") {
-      const isDeviceDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      document.documentElement.classList.toggle("dark", isDeviceDark);
-      setThemeServerFn({ data: isDeviceDark ? "dark" : "light" });
-    }
-  }, []);
+  const theme = useThemeListener();
 
   return (
-    <html lang="en" className={theme ?? ""} suppressHydrationWarning>
+    <html lang="en" className={theme ?? ""}>
       <head>
         <HeadContent />
       </head>

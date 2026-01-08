@@ -40,7 +40,6 @@ const SuggestedUserCard = ({ user }: Props) => {
     //   showToast("Something went wrong", "error");
     // }
   };
-  // const t = useTranslations("SuggestedUsers");
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center justify-start gap-3">
@@ -54,7 +53,7 @@ const SuggestedUserCard = ({ user }: Props) => {
           <Link
             to={"/$username"}
             params={{ username: user.username }}
-            className="overflow-hidden font-medium text-ellipsis whitespace-pre-line"
+            className="font-medium line-clamp-1"
           >
             {user.username}
           </Link>

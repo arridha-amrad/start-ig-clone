@@ -1,6 +1,5 @@
 import { setThemeServerFn } from "@/features/theme";
 import { authClient } from "@/lib/auth-client";
-import { currentUserQueryOptions } from "@/query-options";
 import { cn } from "@/utils";
 import {
   autoUpdate,
@@ -13,7 +12,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { Button } from "@headlessui/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   ActivityIcon,
@@ -44,11 +43,15 @@ import {
 import DialogLogout from "./DialogLogout";
 import MySwitch from "./Switch";
 import { InstagramIcon, InstagramText } from "./svg/Instagram";
+import { ButtonLogout } from "@/features/auth/components/ButtonLogout";
 
-export const Sidebar = () => {
-  const { data } = useQuery(currentUserQueryOptions());
+type SidebarProps = {
+  username: string;
+};
+
+export const Sidebar = ({ username }: SidebarProps) => {
   return (
-    <aside className="lg:w-72 hidden sticky top-0 md:flex flex-col h-screen border-r border-foreground/5 px-2 py-8">
+    <aside className="hidden sticky top-0 md:flex flex-col h-screen border-r border-foreground/5 px-2 lg:px-8 py-8">
       <SidebarBrand />
       <div className="px-2 space-y-2 flex-1">
         <SidebarLink
@@ -82,7 +85,7 @@ export const Sidebar = () => {
           label="Notifications"
         />
         <SidebarLink
-          href={`/${data?.username}`}
+          href={`/${username}`}
           icon={<UserRound className="size-6" />}
           label="Profile"
         />
@@ -119,7 +122,7 @@ const SidebarLink = ({ href, icon, label }: Props) => {
   return (
     <Link
       className={cn(
-        "flex items-center text-xl p-1.5 font-medium hover:bg-foreground/10 gap-2 lg:pr-4 w-max rounded-xl",
+        "flex items-center text-xl p-1.5 hover:bg-foreground/10 gap-2 lg:pr-4 w-max rounded-xl",
         isActive && "bg-foreground/10"
       )}
       preload={false}
@@ -145,7 +148,6 @@ const ButtonCreatePost = () => {
 };
 
 function MoreOptions() {
-  const qc = useQueryClient();
   const [open, setOpen] = useState(false);
   const { refs, floatingStyles, context } = useFloating({
     open,
@@ -167,23 +169,6 @@ function MoreOptions() {
   const [openTheme, setOpenTheme] = useState(false);
 
   const [isPending, startTransition] = useTransition();
-
-  const navigate = useNavigate();
-  const logout = async () => {
-    try {
-      const result = await authClient.signOut();
-      qc.clear();
-      if (result.data?.success) {
-        startTransition(async () => {
-          navigate({ to: "/auth/login", replace: true });
-        });
-      } else {
-        console.log(result.error);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <>
@@ -256,7 +241,7 @@ function MoreOptions() {
                     <OptionsButton icon={<File />} label="Report a problem" />
                     <hr className="bg-skin-muted/20 my-2 h-px w-full border-0" />
                     <OptionsButton label="Switch account" />
-                    <OptionsButton onClick={logout} label="Logout" />
+                    <ButtonLogout startTransition={startTransition} />
                   </>
                 )}
               </motion.div>

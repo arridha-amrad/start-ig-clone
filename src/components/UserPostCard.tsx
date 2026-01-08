@@ -1,4 +1,4 @@
-import { TUserPost } from "@/features/post/serverFn.post";
+import { TUserPost } from "@/features/post/services";
 import { Files, Heart } from "lucide-react";
 
 type Props = {

@@ -4,20 +4,6 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
-// const fetchStories = async () => {};
-
-// export default function Stories() {
-//   return (
-//     <div className="w-full overflow-auto">
-//       <div className="flex items-center gap-x-3 w-max">
-//         {Array.from({ length: 30 }, (_, i) => i).map((index) => (
-//           <StoryAvatar key={index} />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// }
-
 export default function Stories() {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     slidesToScroll: "auto",
