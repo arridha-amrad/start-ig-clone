@@ -1,7 +1,7 @@
 import { me } from "@/features/auth/queries";
 import { Button } from "@headlessui/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import {
   BadgeCheck,
   Link as LinkIcon,
@@ -11,8 +11,11 @@ import {
 import { profile as profileQueryOptions } from "../queries";
 import { ProfileFollowButton } from "./ButtonFollow";
 
-export default function ProfileCard() {
-  const { username } = useParams({ from: "/_optionalAuth/$username" });
+type Props = {
+  username: string;
+};
+
+export default function ProfileCard({ username }: Props) {
   const { data: currentUser } = useSuspenseQuery(me);
   const { data: profile } = useSuspenseQuery(profileQueryOptions(username));
 

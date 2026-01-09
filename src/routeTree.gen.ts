@@ -9,24 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as OptionalAuthRouteImport } from './routes/_optionalAuth'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
 import { Route as MustAuthRouteRouteImport } from './routes/_mustAuth/route'
+import { Route as UsernameRouteRouteImport } from './routes/$username/route'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as MustAuthIndexRouteImport } from './routes/_mustAuth/index'
+import { Route as UsernameIndexRouteImport } from './routes/$username/index'
 import { Route as SettingsNotificationRouteImport } from './routes/settings/notification'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
-import { Route as OptionalAuthUsernameRouteImport } from './routes/_optionalAuth.$username'
 import { Route as MustAuthSearchRouteImport } from './routes/_mustAuth/search'
 import { Route as MustAuthExploreRouteImport } from './routes/_mustAuth/explore'
+import { Route as UsernameTaggedRouteImport } from './routes/$username/tagged'
+import { Route as UsernameSavedRouteImport } from './routes/$username/saved'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const OptionalAuthRoute = OptionalAuthRouteImport.update({
-  id: '/_optionalAuth',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsRouteRoute = SettingsRouteRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -34,6 +32,11 @@ const SettingsRouteRoute = SettingsRouteRouteImport.update({
 } as any)
 const MustAuthRouteRoute = MustAuthRouteRouteImport.update({
   id: '/_mustAuth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsernameRouteRoute = UsernameRouteRouteImport.update({
+  id: '/$username',
+  path: '/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
@@ -45,6 +48,11 @@ const MustAuthIndexRoute = MustAuthIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MustAuthRouteRoute,
+} as any)
+const UsernameIndexRoute = UsernameIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UsernameRouteRoute,
 } as any)
 const SettingsNotificationRoute = SettingsNotificationRouteImport.update({
   id: '/notification',
@@ -66,11 +74,6 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/auth/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OptionalAuthUsernameRoute = OptionalAuthUsernameRouteImport.update({
-  id: '/$username',
-  path: '/$username',
-  getParentRoute: () => OptionalAuthRoute,
-} as any)
 const MustAuthSearchRoute = MustAuthSearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -81,6 +84,16 @@ const MustAuthExploreRoute = MustAuthExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => MustAuthRouteRoute,
 } as any)
+const UsernameTaggedRoute = UsernameTaggedRouteImport.update({
+  id: '/tagged',
+  path: '/tagged',
+  getParentRoute: () => UsernameRouteRoute,
+} as any)
+const UsernameSavedRoute = UsernameSavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
+  getParentRoute: () => UsernameRouteRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -88,42 +101,49 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/$username': typeof UsernameRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
+  '/$username/saved': typeof UsernameSavedRoute
+  '/$username/tagged': typeof UsernameTaggedRoute
   '/explore': typeof MustAuthExploreRoute
   '/search': typeof MustAuthSearchRoute
-  '/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/settings/notification': typeof SettingsNotificationRoute
+  '/$username/': typeof UsernameIndexRoute
   '/': typeof MustAuthIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
+  '/$username/saved': typeof UsernameSavedRoute
+  '/$username/tagged': typeof UsernameTaggedRoute
   '/explore': typeof MustAuthExploreRoute
   '/search': typeof MustAuthSearchRoute
-  '/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/settings/notification': typeof SettingsNotificationRoute
+  '/$username': typeof UsernameIndexRoute
   '/': typeof MustAuthIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/$username': typeof UsernameRouteRouteWithChildren
   '/_mustAuth': typeof MustAuthRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
-  '/_optionalAuth': typeof OptionalAuthRouteWithChildren
+  '/$username/saved': typeof UsernameSavedRoute
+  '/$username/tagged': typeof UsernameTaggedRoute
   '/_mustAuth/explore': typeof MustAuthExploreRoute
   '/_mustAuth/search': typeof MustAuthSearchRoute
-  '/_optionalAuth/$username': typeof OptionalAuthUsernameRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
   '/settings/notification': typeof SettingsNotificationRoute
+  '/$username/': typeof UsernameIndexRoute
   '/_mustAuth/': typeof MustAuthIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -131,50 +151,57 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/$username'
     | '/settings'
+    | '/$username/saved'
+    | '/$username/tagged'
     | '/explore'
     | '/search'
-    | '/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
     | '/settings/notification'
+    | '/$username/'
     | '/'
     | '/settings/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/$username/saved'
+    | '/$username/tagged'
     | '/explore'
     | '/search'
-    | '/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
     | '/settings/notification'
+    | '/$username'
     | '/'
     | '/settings'
     | '/api/auth/$'
   id:
     | '__root__'
+    | '/$username'
     | '/_mustAuth'
     | '/settings'
-    | '/_optionalAuth'
+    | '/$username/saved'
+    | '/$username/tagged'
     | '/_mustAuth/explore'
     | '/_mustAuth/search'
-    | '/_optionalAuth/$username'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
     | '/settings/notification'
+    | '/$username/'
     | '/_mustAuth/'
     | '/settings/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  UsernameRouteRoute: typeof UsernameRouteRouteWithChildren
   MustAuthRouteRoute: typeof MustAuthRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
-  OptionalAuthRoute: typeof OptionalAuthRouteWithChildren
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthSignupRoute: typeof AuthSignupRoute
@@ -183,13 +210,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_optionalAuth': {
-      id: '/_optionalAuth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof OptionalAuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -202,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof MustAuthRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$username': {
+      id: '/$username'
+      path: '/$username'
+      fullPath: '/$username'
+      preLoaderRoute: typeof UsernameRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -217,6 +244,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof MustAuthIndexRouteImport
       parentRoute: typeof MustAuthRouteRoute
+    }
+    '/$username/': {
+      id: '/$username/'
+      path: '/'
+      fullPath: '/$username/'
+      preLoaderRoute: typeof UsernameIndexRouteImport
+      parentRoute: typeof UsernameRouteRoute
     }
     '/settings/notification': {
       id: '/settings/notification'
@@ -246,13 +280,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_optionalAuth/$username': {
-      id: '/_optionalAuth/$username'
-      path: '/$username'
-      fullPath: '/$username'
-      preLoaderRoute: typeof OptionalAuthUsernameRouteImport
-      parentRoute: typeof OptionalAuthRoute
-    }
     '/_mustAuth/search': {
       id: '/_mustAuth/search'
       path: '/search'
@@ -267,6 +294,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MustAuthExploreRouteImport
       parentRoute: typeof MustAuthRouteRoute
     }
+    '/$username/tagged': {
+      id: '/$username/tagged'
+      path: '/tagged'
+      fullPath: '/$username/tagged'
+      preLoaderRoute: typeof UsernameTaggedRouteImport
+      parentRoute: typeof UsernameRouteRoute
+    }
+    '/$username/saved': {
+      id: '/$username/saved'
+      path: '/saved'
+      fullPath: '/$username/saved'
+      preLoaderRoute: typeof UsernameSavedRouteImport
+      parentRoute: typeof UsernameRouteRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -276,6 +317,22 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface UsernameRouteRouteChildren {
+  UsernameSavedRoute: typeof UsernameSavedRoute
+  UsernameTaggedRoute: typeof UsernameTaggedRoute
+  UsernameIndexRoute: typeof UsernameIndexRoute
+}
+
+const UsernameRouteRouteChildren: UsernameRouteRouteChildren = {
+  UsernameSavedRoute: UsernameSavedRoute,
+  UsernameTaggedRoute: UsernameTaggedRoute,
+  UsernameIndexRoute: UsernameIndexRoute,
+}
+
+const UsernameRouteRouteWithChildren = UsernameRouteRoute._addFileChildren(
+  UsernameRouteRouteChildren,
+)
 
 interface MustAuthRouteRouteChildren {
   MustAuthExploreRoute: typeof MustAuthExploreRoute
@@ -307,22 +364,10 @@ const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
   SettingsRouteRouteChildren,
 )
 
-interface OptionalAuthRouteChildren {
-  OptionalAuthUsernameRoute: typeof OptionalAuthUsernameRoute
-}
-
-const OptionalAuthRouteChildren: OptionalAuthRouteChildren = {
-  OptionalAuthUsernameRoute: OptionalAuthUsernameRoute,
-}
-
-const OptionalAuthRouteWithChildren = OptionalAuthRoute._addFileChildren(
-  OptionalAuthRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
+  UsernameRouteRoute: UsernameRouteRouteWithChildren,
   MustAuthRouteRoute: MustAuthRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
-  OptionalAuthRoute: OptionalAuthRouteWithChildren,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthSignupRoute: AuthSignupRoute,
