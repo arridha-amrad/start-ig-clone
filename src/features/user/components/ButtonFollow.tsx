@@ -25,3 +25,21 @@ export const ProfileFollowButton = ({
     </Button>
   );
 };
+
+export const SuggestedUserFollowButton = ({
+  isFollowing,
+  userId,
+}: Omit<ProfileFollowButtonProps, "username">) => {
+  const { mutate } = useFollowMutation({ userId });
+  return (
+    <Button
+      onClick={() => mutate()}
+      className={cn(
+        "text-xs font-medium",
+        isFollowing ? "text-foreground/80" : "text-skin-primary"
+      )}
+    >
+      {isFollowing ? "Following" : "Follow"}
+    </Button>
+  );
+};

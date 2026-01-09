@@ -48,10 +48,12 @@ export default function ProfileCard() {
               <span className="font-bold">{profile?.totalPosts}</span> posts
             </div>
             <div>
-              <span className="font-bold">106K</span> followers
+              <span className="font-bold">{profile.totalFollowers}</span>{" "}
+              followers
             </div>
             <div>
-              <span className="font-bold">53</span> following
+              <span className="font-bold">{profile.totalFollowing}</span>{" "}
+              following
             </div>
           </div>
           {/* BIO */}

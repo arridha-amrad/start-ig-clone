@@ -1,45 +1,13 @@
 import AvatarWithStoryIndicator from "@/components/AvatarWithStoryIndicator";
-// import { follow as fl } from "@/lib/actions/follow";
-// import { TSearchUser } from "@/lib/drizzle/queries/type";
-import { cn } from "@/utils";
-import { Link, useLocation } from "@tanstack/react-router";
-import { useState } from "react";
-
-type User = {
-  name: string;
-  username: string;
-  image: string | null;
-  id: string;
-};
+import { SuggestedUserFollowButton } from "@/features/user/components/ButtonFollow";
+import { TSuggestedUser } from "@/features/user/services";
+import { Link } from "@tanstack/react-router";
 
 type Props = {
-  user: User;
+  user: TSuggestedUser;
 };
 
 const SuggestedUserCard = ({ user }: Props) => {
-  const pathname = useLocation().pathname;
-  const [isFollow, setFollow] = useState(false);
-
-  const follow = async () => {
-    // setFollow((val) => !val);
-    // try {
-    //   const result = await fl.bind(
-    //     null,
-    //     pathname
-    //   )({
-    //     targetId: id,
-    //   });
-    //   if (result?.serverError) {
-    //     showToast(result.serverError, "error");
-    //     setFollow((val) => !val);
-    //   }
-    // } catch (err) {
-    //   if (isRedirectError(err)) {
-    //     return;
-    //   }
-    //   showToast("Something went wrong", "error");
-    // }
-  };
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center justify-start gap-3">
@@ -60,15 +28,10 @@ const SuggestedUserCard = ({ user }: Props) => {
           <p className="text-foreground/70 line-clamp-1 text-xs">{user.name}</p>
         </div>
       </div>
-      <button
-        onClick={follow}
-        className={cn(
-          "text-sm font-medium",
-          isFollow ? "text-foreground/70" : "text-skin-primary"
-        )}
-      >
-        {isFollow ? "unFollow" : "follow"}
-      </button>
+      <SuggestedUserFollowButton
+        userId={user.id}
+        isFollowing={user.isFollowing}
+      />
     </div>
   );
 };

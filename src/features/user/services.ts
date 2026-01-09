@@ -5,24 +5,54 @@ import {
   requireAuthMiddleware,
 } from "@/middlewares/auth.middleware";
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
 
 export const fetchSuggestedUsers = createServerFn()
   .middleware([requireAuthMiddleware])
   .handler(async ({ context: { auth } }) => {
     const currentUserId = auth.user.id;
-    return db
-      .select({
-        id: schema.user.id,
-        username: schema.user.username,
-        name: schema.user.name,
-        image: schema.user.image,
-      })
-      .from(schema.user)
-      .where(ne(schema.user.id, currentUserId))
-      .limit(5);
+    const result = db.query.user.findMany({
+      columns: {
+        id: true,
+        username: true,
+        name: true,
+        image: true,
+      },
+      extras: {
+        isFollowing: sql<boolean>`
+          exists (
+            select 1 
+            from ${schema.follows} 
+            where ${schema.follows.followerId} = ${currentUserId} 
+            and ${schema.follows.followingId} = ${schema.user.id}
+          )`.as("is_following"),
+      },
+      limit: 5,
+      where: (users, { and, ne, notExists, eq }) => {
+        return and(
+          // 1. Exclude the current user
+          ne(users.id, currentUserId),
+          // 2. Exclude users already followed by the current user
+          notExists(
+            db
+              .select()
+              .from(schema.follows)
+              .where(
+                and(
+                  eq(schema.follows.followerId, currentUserId),
+                  eq(schema.follows.followingId, users.id)
+                )
+              )
+          )
+        );
+      },
+    });
+    return result;
   });
+export type TSuggestedUser = Awaited<
+  ReturnType<typeof fetchSuggestedUsers>
+>[number];
 
 export const fetchProfile = createServerFn()
   .inputValidator(
@@ -42,13 +72,21 @@ export const fetchProfile = createServerFn()
         with: {
           additionalInfo: true,
         },
-        extras: {
+        extras: (user, { sql }) => ({
           isFollowing: isFollowing.as("is_following"),
           totalPosts:
             sql<number>`(select count("post"."id") from "post" where "post"."user_id" = "user"."id")`.as(
               "total_posts"
             ),
-        },
+          totalFollowers:
+            sql<number>`(select count("follows"."follower_id") from "follows" where "follows"."following_id" = "user"."id")`.as(
+              "total_followers"
+            ),
+          totalFollowing:
+            sql<number>`(select count("follows"."following_id") from "follows" where "follows"."follower_id" = "user"."id")`.as(
+              "total_following"
+            ),
+        }),
       });
       if (!profile) {
         throw new Error("Profile not found");

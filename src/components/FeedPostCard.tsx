@@ -7,6 +7,8 @@ import { EmblaCarouselType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
 import { formatDistanceToNowStrict } from "date-fns";
+import { Link } from "@tanstack/react-router";
+import { Button } from "@headlessui/react";
 
 type Props = {
   post: TFeedPost;
@@ -17,26 +19,34 @@ export default function FeedPostCard({ post }: Props) {
     <div className="my-4">
       <div className="max-w-md mx-auto bg-background text-foreground rounded-lg overflow-hidden">
         {/* 1. HEADER */}
-        <div className="flex items-center justify-between p-3">
+        <div className="flex items-center justify-between p-3 gap-2">
           <div className="flex items-center gap-3">
             <Avatar post={post} />
-            <div>
+            <div className="space-y-0.5">
               <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold">{post.owner.name}</span>
+                <Link
+                  to="/$username"
+                  params={{ username: post.owner.username }}
+                  className="text-sm font-medium line-clamp-1"
+                >
+                  {post.owner.username}
+                </Link>
                 <VerifiedAccountIndicator />
-                <span className="text-foreground text-sm">
+                <span className="text-foreground/70 text-sm flex-none">
                   •{" "}
                   {formatDistanceToNowStrict(new Date(post.createdAt), {
                     addSuffix: true,
                   })}
                 </span>
               </div>
-              <p className="text-[11px] text-foreground/50 leading-none">
-                {post.location}
-              </p>
+              <p className="text-xs text-foreground/70">{post.location}</p>
             </div>
           </div>
-          <MoreHorizontal className="w-5 h-5 text-foreground cursor-pointer" />
+          <div className="flex-none">
+            <Button>
+              <MoreHorizontal className="w-5 h-5 text-foreground cursor-pointer" />
+            </Button>
+          </div>
         </div>
         {/* 2. CONTENT */}
         <Carousel post={post} />
