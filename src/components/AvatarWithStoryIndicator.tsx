@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/utils";
-import Avatar from "./Avatar";
+import { Avatar } from "./Avatar";
 import { HTMLAttributes, useRef } from "react";
 
 type Props = {

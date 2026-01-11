@@ -8,6 +8,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq, sql } from "drizzle-orm";
 import z from "zod";
 
+export const isFollowingQuery = (currUserId: string) =>
+  sql<boolean>`
+  exists (
+    select 1 
+    from "follows" 
+    where "follows"."follower_id" = ${currUserId} 
+    and "follows"."following_id" = "user"."id"
+    )`.as("is_following");
+
 export const fetchSuggestedUsers = createServerFn()
   .middleware([requireAuthMiddleware])
   .handler(async ({ context: { auth } }) => {
@@ -20,13 +29,7 @@ export const fetchSuggestedUsers = createServerFn()
         image: true,
       },
       extras: {
-        isFollowing: sql<boolean>`
-          exists (
-            select 1 
-            from ${schema.follows} 
-            where ${schema.follows.followerId} = ${currentUserId} 
-            and ${schema.follows.followingId} = ${schema.user.id}
-          )`.as("is_following"),
+        isFollowing: isFollowingQuery(currentUserId),
       },
       limit: 5,
       where: (users, { and, ne, notExists, eq }) => {
@@ -63,17 +66,16 @@ export const fetchProfile = createServerFn()
   .middleware([optionalAuthMiddleware])
   .handler(async ({ data: { username }, context: { auth } }) => {
     const currUserId = auth?.user?.id;
-    const isFollowing = currUserId
-      ? sql<boolean>`exists (select 1 from "follows" where "follows"."follower_id" = ${currUserId} and "follows"."following_id" = "user"."id")`
-      : sql<boolean>`false`;
     try {
       const profile = await db.query.user.findFirst({
         where: (user, { eq }) => eq(user.username, username),
         with: {
           additionalInfo: true,
         },
-        extras: (user, { sql }) => ({
-          isFollowing: isFollowing.as("is_following"),
+        extras: (_, { sql }) => ({
+          isFollowing: currUserId
+            ? isFollowingQuery(currUserId)
+            : sql<boolean>`false`.as("is_following"),
           totalPosts:
             sql<number>`(select count("post"."id") from "post" where "post"."user_id" = "user"."id")`.as(
               "total_posts"

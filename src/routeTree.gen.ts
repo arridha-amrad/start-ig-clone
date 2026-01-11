@@ -10,12 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteRouteImport } from './routes/settings/route'
+import { Route as PRouteRouteImport } from './routes/p/route'
 import { Route as MustAuthRouteRouteImport } from './routes/_mustAuth/route'
 import { Route as UsernameRouteRouteImport } from './routes/$username/route'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as MustAuthIndexRouteImport } from './routes/_mustAuth/index'
 import { Route as UsernameIndexRouteImport } from './routes/$username/index'
 import { Route as SettingsNotificationRouteImport } from './routes/settings/notification'
+import { Route as PIdRouteImport } from './routes/p/$id'
 import { Route as AuthSignupRouteImport } from './routes/auth/signup'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
@@ -28,6 +30,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 const SettingsRouteRoute = SettingsRouteRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PRouteRoute = PRouteRouteImport.update({
+  id: '/p',
+  path: '/p',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MustAuthRouteRoute = MustAuthRouteRouteImport.update({
@@ -58,6 +65,11 @@ const SettingsNotificationRoute = SettingsNotificationRouteImport.update({
   id: '/notification',
   path: '/notification',
   getParentRoute: () => SettingsRouteRoute,
+} as any)
+const PIdRoute = PIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PRouteRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
   id: '/auth/signup',
@@ -102,6 +114,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/$username': typeof UsernameRouteRouteWithChildren
+  '/p': typeof PRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/$username/saved': typeof UsernameSavedRoute
   '/$username/tagged': typeof UsernameTaggedRoute
@@ -110,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/p/$id': typeof PIdRoute
   '/settings/notification': typeof SettingsNotificationRoute
   '/$username/': typeof UsernameIndexRoute
   '/': typeof MustAuthIndexRoute
@@ -117,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
+  '/p': typeof PRouteRouteWithChildren
   '/$username/saved': typeof UsernameSavedRoute
   '/$username/tagged': typeof UsernameTaggedRoute
   '/explore': typeof MustAuthExploreRoute
@@ -124,6 +139,7 @@ export interface FileRoutesByTo {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/p/$id': typeof PIdRoute
   '/settings/notification': typeof SettingsNotificationRoute
   '/$username': typeof UsernameIndexRoute
   '/': typeof MustAuthIndexRoute
@@ -134,6 +150,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/$username': typeof UsernameRouteRouteWithChildren
   '/_mustAuth': typeof MustAuthRouteRouteWithChildren
+  '/p': typeof PRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/$username/saved': typeof UsernameSavedRoute
   '/$username/tagged': typeof UsernameTaggedRoute
@@ -142,6 +159,7 @@ export interface FileRoutesById {
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/p/$id': typeof PIdRoute
   '/settings/notification': typeof SettingsNotificationRoute
   '/$username/': typeof UsernameIndexRoute
   '/_mustAuth/': typeof MustAuthIndexRoute
@@ -152,6 +170,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/$username'
+    | '/p'
     | '/settings'
     | '/$username/saved'
     | '/$username/tagged'
@@ -160,6 +179,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
+    | '/p/$id'
     | '/settings/notification'
     | '/$username/'
     | '/'
@@ -167,6 +187,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/p'
     | '/$username/saved'
     | '/$username/tagged'
     | '/explore'
@@ -174,6 +195,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
+    | '/p/$id'
     | '/settings/notification'
     | '/$username'
     | '/'
@@ -183,6 +205,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/$username'
     | '/_mustAuth'
+    | '/p'
     | '/settings'
     | '/$username/saved'
     | '/$username/tagged'
@@ -191,6 +214,7 @@ export interface FileRouteTypes {
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/signup'
+    | '/p/$id'
     | '/settings/notification'
     | '/$username/'
     | '/_mustAuth/'
@@ -201,6 +225,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   UsernameRouteRoute: typeof UsernameRouteRouteWithChildren
   MustAuthRouteRoute: typeof MustAuthRouteRouteWithChildren
+  PRouteRoute: typeof PRouteRouteWithChildren
   SettingsRouteRoute: typeof SettingsRouteRouteWithChildren
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
@@ -215,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p': {
+      id: '/p'
+      path: '/p'
+      fullPath: '/p'
+      preLoaderRoute: typeof PRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_mustAuth': {
@@ -258,6 +290,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings/notification'
       preLoaderRoute: typeof SettingsNotificationRouteImport
       parentRoute: typeof SettingsRouteRoute
+    }
+    '/p/$id': {
+      id: '/p/$id'
+      path: '/$id'
+      fullPath: '/p/$id'
+      preLoaderRoute: typeof PIdRouteImport
+      parentRoute: typeof PRouteRoute
     }
     '/auth/signup': {
       id: '/auth/signup'
@@ -350,6 +389,17 @@ const MustAuthRouteRouteWithChildren = MustAuthRouteRoute._addFileChildren(
   MustAuthRouteRouteChildren,
 )
 
+interface PRouteRouteChildren {
+  PIdRoute: typeof PIdRoute
+}
+
+const PRouteRouteChildren: PRouteRouteChildren = {
+  PIdRoute: PIdRoute,
+}
+
+const PRouteRouteWithChildren =
+  PRouteRoute._addFileChildren(PRouteRouteChildren)
+
 interface SettingsRouteRouteChildren {
   SettingsNotificationRoute: typeof SettingsNotificationRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
@@ -367,6 +417,7 @@ const SettingsRouteRouteWithChildren = SettingsRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   UsernameRouteRoute: UsernameRouteRouteWithChildren,
   MustAuthRouteRoute: MustAuthRouteRouteWithChildren,
+  PRouteRoute: PRouteRouteWithChildren,
   SettingsRouteRoute: SettingsRouteRouteWithChildren,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,

@@ -7,14 +7,8 @@ import { profile } from "@/features/user/queries";
 import { optionalAuthMiddleware } from "@/middlewares/auth.middleware";
 import { cn } from "@/utils";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  useLocation,
-  useMatch,
-} from "@tanstack/react-router";
-import { Bookmark, Grid, Tag, UserSquareIcon } from "lucide-react";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { Bookmark, Grid, UserSquareIcon } from "lucide-react";
 import { ReactNode } from "react";
 
 export const Route = createFileRoute("/$username")({

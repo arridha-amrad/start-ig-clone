@@ -1,14 +1,22 @@
 import { TFeedPost } from "@/features/post/services";
 import { cn } from "@/utils";
-import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
+import {
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+  MessageCircle,
+  MoreHorizontal,
+  Send,
+} from "lucide-react";
 import VerifiedAccountIndicator from "./VerifiedAccountIndicator";
 import { FeedPostLikeButton } from "@/features/post/components/ButtonLike";
 import { EmblaCarouselType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { useCallback, useEffect, useState } from "react";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@headlessui/react";
+import { PostAvatar } from "./Avatar";
 
 type Props = {
   post: TFeedPost;
@@ -21,7 +29,7 @@ export default function FeedPostCard({ post }: Props) {
         {/* 1. HEADER */}
         <div className="flex items-center justify-between p-3 gap-2">
           <div className="flex items-center gap-3">
-            <Avatar post={post} />
+            <PostAvatar url={post.owner.image} />
             <div className="space-y-0.5">
               <div className="flex items-center gap-1">
                 <Link
@@ -67,35 +75,6 @@ export default function FeedPostCard({ post }: Props) {
   );
 }
 
-function Avatar({ post }: { post: TFeedPost }) {
-  const hasStory = true;
-  return (
-    <div className="flex flex-none flex-col items-center space-y-1 w-max">
-      {/* Outer Gradient Ring */}
-      <div
-        className={cn(
-          "flex flex-none items-center justify-center rounded-full p-0.5",
-          hasStory
-            ? "bg-linear-to-tr from-yellow-400 via-red-500 to-purple-600"
-            : "bg-gray-300"
-        )}
-      >
-        {/* Inner Gap (Black) */}
-        <div className="bg-background flex-none rounded-full p-0.5">
-          {/* Profile Image */}
-          <img
-            src={post.owner.image ?? "/default.jpg"}
-            alt={"avatar"}
-            width={100}
-            height={100}
-            className="size-8 rounded-full object-cover border border-background"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Caption({ post }: { post: TFeedPost }) {
   return (
     <div className="space-y-1">
@@ -113,9 +92,13 @@ function Caption({ post }: { post: TFeedPost }) {
 }
 
 function Comment({ post }: { post: TFeedPost }) {
+  const navigate = useNavigate();
   return (
     <div className="flex items-center gap-x-2">
-      <MessageCircle className="w-6 h-6 hover:text-gray-400 cursor-pointer" />
+      <MessageCircle
+        onClick={() => navigate({ to: "/p/$id", params: { id: post.id } })}
+        className="size-6 cursor-pointer"
+      />
       {/* <p className="text-sm">{post.totalComments as string}</p> */}
     </div>
   );
@@ -142,7 +125,7 @@ function Carousel({ post }: { post: TFeedPost }) {
   }, [emblaApi, onInit, onSelect]);
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full group">
       <div
         className={cn(
           "overflow-hidden rounded-lg",
@@ -169,13 +152,27 @@ function Carousel({ post }: { post: TFeedPost }) {
               <img
                 src={url.url}
                 alt="post image"
-                // placeholder="blur"
-                // blurDataURL={rgbDataURL(60, 60, 60)}
                 className="h-full w-full object-cover"
               />
             </div>
           ))}
         </div>
+      </div>
+      <div className="absolute group-hover:opacity-100 transition-opacity duration-150 ease-in opacity-0 left-4 top-1/2 -translate-y-1/2">
+        <Button
+          onClick={() => emblaApi?.scrollPrev()}
+          className="size-max p-1 rounded-full bg-background/50"
+        >
+          <ChevronLeft className="w-5 h-5 text-foreground cursor-pointer" />
+        </Button>
+      </div>
+      <div className="absolute group-hover:opacity-100 transition-opacity duration-150 ease-in opacity-0 right-4 top-1/2 -translate-y-1/2">
+        <Button
+          onClick={() => emblaApi?.scrollNext()}
+          className="size-max p-1 rounded-full bg-background/50"
+        >
+          <ChevronRight className="w-5 h-5 text-foreground cursor-pointer" />
+        </Button>
       </div>
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center justify-center gap-1">
         {scrollSnaps.map((_, i) => (

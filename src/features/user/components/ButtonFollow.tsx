@@ -43,3 +43,11 @@ export const SuggestedUserFollowButton = ({
     </Button>
   );
 };
+
+export const PostDetailFollowButton = () => {
+  return (
+    <Button className="text-blue-500 font-medium text-sm cursor-pointer">
+      Follow
+    </Button>
+  );
+};
