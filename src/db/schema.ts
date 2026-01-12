@@ -11,7 +11,58 @@ import {
   integer,
   primaryKey,
   check,
+  foreignKey,
 } from "drizzle-orm/pg-core";
+
+export const comments = pgTable(
+  "comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    content: text("content").notNull(),
+    // Who wrote it
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    // Which post it belongs to
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => post.id, { onDelete: "cascade" }),
+    // The "Self-Reference" for replies
+    // If null, it's a top-level comment. If set, it's a reply.
+    parentId: uuid("parent_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    // Optional: Explicit foreign key for the self-reference
+    foreignKey({
+      columns: [table.parentId],
+      foreignColumns: [table.id],
+      name: "comments_parent_id_fkey",
+    }).onDelete("cascade"),
+  ]
+);
+// Defining Relations for easier querying
+export const commentsRelations = relations(comments, ({ one, many }) => ({
+  // A comment belongs to a user
+  user: one(user, {
+    fields: [comments.userId],
+    references: [user.id],
+  }),
+  // A comment belongs to a post
+  post: one(post, {
+    fields: [comments.postId],
+    references: [post.id],
+  }),
+  // A comment can have many replies
+  replies: many(comments, { relationName: "threaded_comments" }),
+  // A reply belongs to one parent comment
+  parent: one(comments, {
+    fields: [comments.parentId],
+    references: [comments.id],
+    relationName: "threaded_comments",
+  }),
+}));
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -180,6 +231,7 @@ export const postRelations = relations(post, ({ one, many }) => ({
   }),
   media: many(postMedia), // Satu post punya banyak media
   likes: many(postLike),
+  comments: many(comments),
 }));
 
 export const mediaTypeEnum = pgEnum("media_type", ["image", "video"]);

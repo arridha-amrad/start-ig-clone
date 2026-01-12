@@ -1,4 +1,4 @@
-import { cn } from "@/utils"; // Asumsi utility tailwind
+import { cn } from "@/utils";
 import { Heart } from "lucide-react";
 import { useLikePostMutation } from "../mutations";
 import { TFeedPost } from "../services";

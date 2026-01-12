@@ -16,6 +16,7 @@ export const Route = createFileRoute("/p")({
 
 function RouteComponent() {
   const { data: currentUser } = useSuspenseQuery(me);
+
   return (
     <div className="flex min-h-screen container max-w-[1280px] mx-auto">
       {currentUser && <Sidebar username={currentUser.username} />}

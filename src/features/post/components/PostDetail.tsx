@@ -1,21 +1,14 @@
+import { PostAvatar } from "@/components/Avatar";
+import Carousel from "@/components/Carousel";
+import CommentCard from "@/components/CommentCard";
 import { PostDetailFollowButton } from "@/features/user/components/ButtonFollow";
-import {
-  Heart,
-  MessageCircle,
-  Send,
-  Bookmark,
-  MoreHorizontal,
-  Smile,
-} from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { postDetail } from "../queries";
 import { PostDetailLikeButton } from "./ButtonLike";
 import FormComment from "./FormComment";
-import { useEffect, useRef, useState } from "react";
-import CommentCard from "@/components/CommentCard";
-import Carousel from "@/components/Carousel";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { postDetail } from "../queries";
-import { PostAvatar } from "@/components/Avatar";
-import { Link } from "@tanstack/react-router";
 
 type Props = {
   id: string;

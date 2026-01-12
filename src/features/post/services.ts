@@ -1,14 +1,13 @@
 import db from "@/db";
-import { postLike } from "@/db/schema";
+import { postLike, comments } from "@/db/schema";
 import {
   optionalAuthMiddleware,
   requireAuthMiddleware,
 } from "@/middlewares/auth.middleware";
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, NotNull, sql } from "drizzle-orm";
 import { setTimeout } from "timers/promises";
 import { z } from "zod";
-import { isFollowingQuery } from "../user/services";
 
 const totalLikesQuery = sql<number>`(
     select count(*) 
@@ -23,6 +22,57 @@ const isLikedQuery = (authUserId: string) =>
     where "post_like"."post_id" = "post"."id"
     and "post_like"."user_id" = ${authUserId})
   )`.as("is_liked");
+
+const USER_COLUMN = {
+  name: true,
+  image: true,
+  id: true,
+  username: true,
+};
+
+const addCommentSchema = z.object({
+  postId: z.string(),
+  body: z.string(),
+  parenCommenttId: z.string().optional(),
+});
+export type TAddCommentSchema = z.infer<typeof addCommentSchema>;
+export const addComment = createServerFn()
+  .inputValidator(addCommentSchema)
+  .middleware([requireAuthMiddleware])
+  .handler(
+    async ({
+      data: { body, postId, parenCommenttId },
+      context: {
+        auth: { user },
+      },
+    }) => {
+      const result = await db
+        .insert(comments)
+        .values({
+          content: body,
+          postId,
+          userId: user.id,
+          parentId: parenCommenttId,
+        })
+        .returning();
+      // const comment = await db.query.comments.findFirst({
+      //   where: ({ id }, { eq }) => eq(id, result[0].id),
+      //   with: {
+      //     user: {
+      //       columns: USER_COLUMN,
+      //     },
+      //     replies: {
+      //       with: {
+      //         user: {
+      //           columns: USER_COLUMN,
+      //         },
+      //       },
+      //     },
+      //   },
+      // });
+      return result[0];
+    }
+  );
 
 export const fetchPostDetail = createServerFn()
   .middleware([optionalAuthMiddleware])
@@ -57,6 +107,33 @@ export const fetchPostDetail = createServerFn()
                 : sql<boolean>`false`.as("is_following"),
             }),
           },
+          comments: {
+            orderBy: (fields, { desc }) => desc(fields.createdAt),
+            with: {
+              replies: {
+                orderBy: ({ createdAt }, { asc }) => asc(createdAt),
+                limit: 5,
+                with: {
+                  user: {
+                    columns: {
+                      name: true,
+                      image: true,
+                      id: true,
+                      username: true,
+                    },
+                  },
+                },
+              },
+              user: {
+                columns: {
+                  name: true,
+                  image: true,
+                  id: true,
+                  username: true,
+                },
+              },
+            },
+          },
         },
         extras: {
           totalLikes: totalLikesQuery,
@@ -66,7 +143,7 @@ export const fetchPostDetail = createServerFn()
         },
       });
       if (!post) {
-        throw new Error("Post not found");
+        return null;
       }
       return post;
     } catch (err) {
@@ -74,6 +151,10 @@ export const fetchPostDetail = createServerFn()
       throw new Error("Something went wrong");
     }
   });
+export type TFetchPostDetail = Awaited<ReturnType<typeof fetchPostDetail>>;
+export type TComment = NonNullable<TFetchPostDetail>["comments"][number];
+export type TReply =
+  NonNullable<TFetchPostDetail>["comments"][number]["replies"][number];
 
 export const likePost = createServerFn({ method: "POST" })
   .inputValidator(

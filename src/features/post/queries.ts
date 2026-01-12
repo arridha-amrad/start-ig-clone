@@ -5,6 +5,7 @@ export const postKeys = {
   feedPosts: "feed-posts",
   userPosts: "user-posts",
   postDetail: (id: string) => ["post-detail", id],
+  comments: (postId: string) => ["comments", postId],
 };
 
 export const feedPosts = queryOptions({
