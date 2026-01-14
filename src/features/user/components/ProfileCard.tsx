@@ -41,14 +41,14 @@ export default function ProfileCard({ username }: Props) {
         {/* Username & Stats */}
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-semibold">{profile?.username}</h1>
+            <h1 className="text-2xl font-semibold">{profile.username}</h1>
             <BadgeCheck className="size-5 fill-blue-500 text-background" />
             <MoreHorizontal className="ml-2 w-6 h-6 cursor-pointer" />
           </div>
           <h2 className="font-light text-sm">{profile?.name}</h2>
           <div className="flex gap-6 text-sm my-4 md:text-base">
             <div>
-              <span className="font-bold">{profile?.totalPosts}</span> posts
+              <span className="font-bold">{profile.totalPosts}</span> posts
             </div>
             <div>
               <span className="font-bold">{profile.totalFollowers}</span>{" "}

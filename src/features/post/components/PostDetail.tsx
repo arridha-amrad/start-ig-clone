@@ -1,14 +1,17 @@
 import { PostAvatar } from "@/components/Avatar";
 import Carousel from "@/components/Carousel";
-import CommentCard from "@/components/CommentCard";
 import { PostDetailFollowButton } from "@/features/user/components/ButtonFollow";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { postDetail } from "../queries";
+import { comments, postDetail } from "../queries";
 import { PostDetailLikeButton } from "./ButtonLike";
-import FormComment from "./FormComment";
+import FormComment from "../../comments/components/FormComment";
+import { formatDistanceToNowStrict } from "date-fns";
+import Comments from "../../comments/components/CommentList";
+import { cn } from "@/utils";
+import useMeasure from "react-use-measure";
 
 type Props = {
   id: string;
@@ -16,22 +19,21 @@ type Props = {
 
 const PostDetail = ({ id }: Props) => {
   const { data: post } = useSuspenseQuery(postDetail(id));
+
+  const [refMeasure, { height }] = useMeasure();
+
   const formCommentInputRef = useRef<HTMLInputElement | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const [height, setHeight] = useState<number>(0);
-
-  useEffect(() => {
-    setHeight(ref.current?.offsetHeight ?? 0);
-  }, []);
 
   return (
     <div
       style={{ height }}
-      className="flex w-full border border-foreground/20 overflow-hidden rounded-xl"
+      className={cn(
+        "flex w-full overflow-hidden rounded-xl",
+        height === 0 ? "" : "border border-foreground/20"
+      )}
     >
       {/* LEFT SIDE: Image/Graphic Section */}
-      <div ref={ref} className="h-max">
+      <div ref={refMeasure} className="h-max flex-1">
         <Carousel
           aspectRatio={post.aspectRatio}
           url={post.media.map((media) => media.url)}
@@ -64,15 +66,7 @@ const PostDetail = ({ id }: Props) => {
         {/* Scrollable Comments Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Main Caption */}
-          <CommentCard />
-          <CommentCard />
-          <CommentCard />
-          <CommentCard />
-          <CommentCard />
-          <CommentCard />
-          <CommentCard />
-          <CommentCard />
-          <CommentCard />
+          <Comments postId={id} />
         </div>
 
         {/* Footer Actions */}
@@ -91,11 +85,10 @@ const PostDetail = ({ id }: Props) => {
           </div>
           <div className="font-semibold text-sm">73,166 likes</div>
           <div className="text-foreground/50 text-[10px] uppercase mt-1">
-            1 DAY AGO
+            {formatDistanceToNowStrict(post.createdAt, { addSuffix: true })}
           </div>
         </div>
-        {/* Comment Input */}
-        <FormComment ref={formCommentInputRef} />
+        <FormComment postId={id} ref={formCommentInputRef} />
       </div>
     </div>
   );

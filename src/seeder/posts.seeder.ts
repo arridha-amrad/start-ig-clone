@@ -1,5 +1,5 @@
-import db from "@/db";
-import * as schema from "@/db/schema";
+import db from "@/lib/db";
+import * as schema from "@/lib/db/tables";
 import { faker } from "@faker-js/faker";
 
 const generateDummyPosts = async (total: number) => {

@@ -12,6 +12,14 @@ export const Route = createFileRoute("/p")({
   loader: ({ context: { queryClient }, serverContext }) => {
     queryClient.setQueryData([authKeys.currentUser], serverContext?.auth?.user);
   },
+  errorComponent: ({ error, info }) => {
+    return (
+      <>
+        <div>{JSON.stringify(info)}</div>
+        <div>{JSON.stringify(error)}</div>
+      </>
+    );
+  },
 });
 
 function RouteComponent() {

@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchFeedPosts, fetchPostDetail, fetchUserPosts } from "./services";
+import { fetchComments } from "../comments/service";
 
 export const postKeys = {
   feedPosts: "feed-posts",
@@ -27,5 +28,12 @@ export const postDetail = (postId: string) =>
   queryOptions({
     queryKey: postKeys.postDetail(postId),
     queryFn: () => fetchPostDetail({ data: { postId } }),
+    staleTime: 60 * 60 * 1000,
+  });
+
+export const comments = (postId: string) =>
+  queryOptions({
+    queryKey: postKeys.comments(postId),
+    queryFn: () => fetchComments({ data: { postId } }),
     staleTime: 60 * 60 * 1000,
   });

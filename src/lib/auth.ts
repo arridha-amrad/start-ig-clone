@@ -1,16 +1,15 @@
+import db from "@/lib/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import db from "@/db";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
+import { verifyUser } from "./db/repositories/users/afterVerification";
 import { sendEmail } from "./mailer";
-import * as schema from "@/db/schema";
-import { eq } from "drizzle-orm";
 
 export const auth = betterAuth({
   session: {
     cookieCache: {
       enabled: true,
-      maxAge: 60 * 5,
+      maxAge: 5 * 60,
     },
   },
   plugins: [tanstackStartCookies()],
@@ -31,14 +30,8 @@ export const auth = betterAuth({
       });
     },
     sendOnSignUp: true,
-    async afterEmailVerification(user) {
-      await db.insert(schema.userAdditionalInfo).values({
-        userId: user.id,
-      });
-      await db
-        .update(schema.user)
-        .set({ verifiedAt: new Date() })
-        .where(eq(schema.user.id, user.id));
+    afterEmailVerification: async (user) => {
+      verifyUser(user.id);
     },
     autoSignInAfterVerification: true,
   },

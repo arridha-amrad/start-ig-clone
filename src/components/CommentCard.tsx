@@ -1,25 +1,27 @@
-import { Button } from "@headlessui/react";
-import { Heart } from "lucide-react";
+import { CommentButtonLike } from "@/features/comments/components/ButtonLike";
+import { TComment } from "@/features/comments/types";
 
-export default function CommentCard() {
+type Props = {
+  comment: TComment;
+};
+
+export default function CommentCard({ comment }: Props) {
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-4 border">
       <div className="flex-none rounded-full overflow-hidden h-8 aspect-square">
         <img
-          src="/default.jpg"
+          src={comment.user.image ?? "/default.jpg"}
           alt="default"
           className="aspect-square object-cover"
         />
       </div>
-      <div className="text-sm">
-        <span className="font-semibold mr-2">afrika.world</span>
-        Lumumba VEA, whose real name is Michel Kuka Mboladinga, is a Congolese
-        football superfan...
+      <div className="text-sm flex-1">
+        <span className="font-semibold mr-2">{comment.user.username}</span>
+        {comment.content} Lorem ipsum dolor sit amet consectetur adipisicing
+        elit. Ex, blanditiis!
       </div>
-      <div className="py-4">
-        <Button className="">
-          <Heart className="size-4" />
-        </Button>
+      <div className="">
+        <CommentButtonLike commentId={comment.id} />
       </div>
     </div>
   );

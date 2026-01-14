@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { follow, TProfile, TSuggestedUser } from "./services";
+import { follow } from "./services";
 import { userKeys } from "./queries";
 import toast from "react-hot-toast";
+import { TProfile, TSuggestedUser } from "./types";
 
 type Params = {
   userId: string;
@@ -51,6 +52,8 @@ export const useFollowMutation = ({ userId, username }: Params) => {
       const suggestedUsersOldData = qc.getQueryData<TSuggestedUser[]>([
         userKeys.suggestedUsers,
       ]);
+
+      // post detail
 
       return {
         profileOldData,

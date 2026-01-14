@@ -1,4 +1,3 @@
-import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -7,12 +6,13 @@ import {
   index,
   uuid,
   unique,
-  pgEnum,
   integer,
   primaryKey,
   check,
   foreignKey,
 } from "drizzle-orm/pg-core";
+import { genderEnum, mediaTypeEnum } from "./enum";
+import { sql } from "drizzle-orm";
 
 export const comments = pgTable(
   "comments",
@@ -42,27 +42,6 @@ export const comments = pgTable(
     }).onDelete("cascade"),
   ]
 );
-// Defining Relations for easier querying
-export const commentsRelations = relations(comments, ({ one, many }) => ({
-  // A comment belongs to a user
-  user: one(user, {
-    fields: [comments.userId],
-    references: [user.id],
-  }),
-  // A comment belongs to a post
-  post: one(post, {
-    fields: [comments.postId],
-    references: [post.id],
-  }),
-  // A comment can have many replies
-  replies: many(comments, { relationName: "threaded_comments" }),
-  // A reply belongs to one parent comment
-  parent: one(comments, {
-    fields: [comments.parentId],
-    references: [comments.id],
-    relationName: "threaded_comments",
-  }),
-}));
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -81,15 +60,6 @@ export const user = pgTable("user", {
   isProtected: boolean("is_protected").default(false).notNull(),
   verifiedAt: timestamp("verified_at"),
 });
-export const userRelations = relations(user, ({ many, one }) => ({
-  sessions: many(session),
-  accounts: many(account),
-  additionalInfo: one(userAdditionalInfo),
-  // Orang-orang yang diikuti oleh user ini
-  following: many(follows, { relationName: "following" }),
-  // Orang-orang yang mengikuti user ini (pengikut)
-  followers: many(follows, { relationName: "followers" }),
-}));
 
 export const follows = pgTable(
   "follows",
@@ -109,24 +79,7 @@ export const follows = pgTable(
     check("no_self_follow", sql`${table.followerId} <> ${table.followingId}`),
   ]
 );
-export const followsRelations = relations(follows, ({ one }) => ({
-  follower: one(user, {
-    fields: [follows.followerId],
-    references: [user.id],
-    relationName: "following",
-  }),
-  following: one(user, {
-    fields: [follows.followingId],
-    references: [user.id],
-    relationName: "followers",
-  }),
-}));
 
-export const genderEnum = pgEnum("gender_options_enum", [
-  "-",
-  "female",
-  "male",
-]);
 export const userAdditionalInfo = pgTable("user_additional_info", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: text("user_id")
@@ -144,15 +97,6 @@ export const userAdditionalInfo = pgTable("user_additional_info", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
-export const userAdditionalInfoRelation = relations(
-  userAdditionalInfo,
-  ({ one }) => ({
-    user: one(user, {
-      fields: [userAdditionalInfo.userId],
-      references: [user.id],
-    }),
-  })
-);
 
 export const session = pgTable(
   "session",
@@ -224,17 +168,7 @@ export const post = pgTable("post", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   aspectRatio: text("aspect_ratio").default("1:1").notNull(),
 });
-export const postRelations = relations(post, ({ one, many }) => ({
-  owner: one(user, {
-    fields: [post.userId],
-    references: [user.id],
-  }),
-  media: many(postMedia), // Satu post punya banyak media
-  likes: many(postLike),
-  comments: many(comments),
-}));
 
-export const mediaTypeEnum = pgEnum("media_type", ["image", "video"]);
 export const postMedia = pgTable("post_media", {
   id: uuid("id").primaryKey().defaultRandom(),
   postId: uuid("post_id")
@@ -245,12 +179,6 @@ export const postMedia = pgTable("post_media", {
   order: integer("order").notNull().default(0), // Untuk urutan slide (1, 2, 3...)
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
-export const postMediaRelations = relations(postMedia, ({ one }) => ({
-  post: one(post, {
-    fields: [postMedia.postId],
-    references: [post.id],
-  }),
-}));
 
 export const postLike = pgTable(
   "post_like",
@@ -266,25 +194,14 @@ export const postLike = pgTable(
   },
   (table) => [unique().on(table.userId, table.postId)]
 );
-export const postLikeRelations = relations(postLike, ({ one }) => ({
-  post: one(post, {
-    fields: [postLike.postId],
-    references: [post.id],
-  }),
-}));
 
-// ================== RELATIONS ===============
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
-}));
+export const commentLike = pgTable("comment_like", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  commentId: uuid("comment_id")
+    .notNull()
+    .references(() => comments.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});

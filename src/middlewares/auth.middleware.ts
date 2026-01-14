@@ -1,15 +1,31 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "@tanstack/react-router";
 import { createMiddleware } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
+import {
+  getRequestHeaders,
+  setResponseHeader,
+} from "@tanstack/react-start/server";
+
+const sessionLoookUp = async () => {
+  const headers = getRequestHeaders();
+  const sessionResponse = await auth.api.getSession({
+    headers,
+    asResponse: true,
+  });
+  const session = await sessionResponse.json();
+  const setCookieHeader = sessionResponse.headers.get("set-cookie");
+  if (setCookieHeader) {
+    setResponseHeader("set-cookie", setCookieHeader);
+  }
+  return session;
+};
 
 export const requireAuthMiddleware = createMiddleware().server(
   async ({ next }) => {
-    const headers = getRequestHeaders();
     try {
-      const session = await auth.api.getSession({ headers });
+      const session = await sessionLoookUp();
       if (!session) {
-        throw redirect({ to: "/auth/login" });
+        throw new Error("session not found");
       }
       return next({
         context: {
@@ -25,9 +41,8 @@ export const requireAuthMiddleware = createMiddleware().server(
 
 export const optionalAuthMiddleware = createMiddleware().server(
   async ({ next }) => {
-    const headers = getRequestHeaders();
     try {
-      const session = await auth.api.getSession({ headers });
+      const session = await sessionLoookUp();
       return next({
         context: {
           auth: session,

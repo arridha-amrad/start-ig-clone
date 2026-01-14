@@ -1,14 +1,7 @@
-import { cn } from "@/utils";
-import { Smile } from "lucide-react";
-import {
-  Dispatch,
-  FormEvent,
-  RefObject,
-  SetStateAction,
-  useState,
-} from "react";
+import EmojiPicker from "@/components/EmojiPicker";
 import useClickOutside from "@/hooks/useClickOutside";
 import useEscapePressed from "@/hooks/useEscPress";
+import { cn } from "@/utils";
 import {
   autoUpdate,
   FloatingPortal,
@@ -19,15 +12,29 @@ import {
   useInteractions,
   useRole,
 } from "@floating-ui/react";
-import EmojiPicker from "@/components/EmojiPicker";
-import { useRef } from "react";
+import { Loader2, Smile } from "lucide-react";
 import mergeRefs from "merge-refs";
+import {
+  Dispatch,
+  FormEvent,
+  RefObject,
+  SetStateAction,
+  useRef,
+  useState,
+} from "react";
+import { addCommentSchema } from "@/lib/zod/post.schema";
+import z from "zod";
+import toast from "react-hot-toast";
+import { useAddCommentMutation } from "../mutations";
 
 type Props = {
+  postId: string;
   ref: React.RefObject<HTMLInputElement | null>;
 };
 
-export default function FormComment({ ref }: Props) {
+export default function FormComment({ ref, postId }: Props) {
+  const { mutateAsync, isPending } = useAddCommentMutation(postId);
+
   const [body, setBody] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const cursorPositionRef = useRef<number>(0);
@@ -41,7 +48,23 @@ export default function FormComment({ ref }: Props) {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({ body });
+    const validation = addCommentSchema.safeParse({
+      postId,
+      body,
+    });
+    if (!validation.success) {
+      const err = validation.error;
+      const errBody = z.treeifyError(err).properties?.body?.errors[0];
+      if (errBody) {
+        toast.error(errBody);
+      }
+      return;
+    }
+    try {
+      await mutateAsync({ body: validation.data.body, postId });
+      setBody("");
+      cursorPositionRef.current = 0;
+    } catch (err) {}
   };
 
   return (
@@ -53,8 +76,10 @@ export default function FormComment({ ref }: Props) {
         cursorPosition={cursorPositionRef}
         inputRef={inputRef}
         setText={setBody}
+        disabled={isPending}
       />
       <input
+        disabled={isPending}
         ref={mergeRefs(ref, inputRef)}
         type="text"
         placeholder="Add a comment..."
@@ -65,25 +90,31 @@ export default function FormComment({ ref }: Props) {
         onKeyUp={handleCursorPosition}
       />
       <button
+        disabled={isPending}
         type="submit"
         className={cn(
           "font-medium text-sm",
           !!body ? "text-blue-500" : "text-foreground/50"
         )}
       >
-        Post
+        {isPending ? (
+          <Loader2 className="animate-spin size-5 text-foreground/70" />
+        ) : (
+          "Post"
+        )}
       </button>
     </form>
   );
 }
 
 type EmojiProps = {
+  disabled: boolean;
   setText: Dispatch<SetStateAction<string>>;
   inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
   cursorPosition: RefObject<number>;
 };
 
-function Emoji({ cursorPosition, inputRef, setText }: EmojiProps) {
+function Emoji({ cursorPosition, disabled, inputRef, setText }: EmojiProps) {
   const [open, setOpen] = useState(false);
   const ref = useClickOutside(() => setOpen(false));
   useEscapePressed(() => setOpen(false), false);
@@ -108,6 +139,7 @@ function Emoji({ cursorPosition, inputRef, setText }: EmojiProps) {
   return (
     <div className="flex items-center justify-center" ref={ref}>
       <button
+        disabled={disabled}
         ref={refs.setReference}
         {...getReferenceProps()}
         type="button"

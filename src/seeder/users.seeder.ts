@@ -1,7 +1,7 @@
-import * as schema from "@/db/schema";
+import * as schema from "@/lib/db/tables";
 import { hashPassword, generateRandomString } from "better-auth/crypto";
 import { faker } from "@faker-js/faker";
-import db from "@/db";
+import db from "@/lib/db";
 
 const main = async () => {
   const promises = Array.from({ length: 10 }).map(async () => {

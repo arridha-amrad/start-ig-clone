@@ -71,6 +71,13 @@
       "when": 1768222778560,
       "tag": "0009_safe_fantastic_four",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1768315522960,
+      "tag": "0010_plain_madame_masque",
+      "breakpoints": true
     }
   ]
 }

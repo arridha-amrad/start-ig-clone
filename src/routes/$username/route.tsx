@@ -7,7 +7,12 @@ import { profile } from "@/features/user/queries";
 import { optionalAuthMiddleware } from "@/middlewares/auth.middleware";
 import { cn } from "@/utils";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  Outlet,
+} from "@tanstack/react-router";
 import { Bookmark, Grid, UserSquareIcon } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -26,6 +31,11 @@ export const Route = createFileRoute("/$username")({
     context: { queryClient },
     serverContext,
   }) => {
+    // Daftar kata yang dilarang menjadi username
+    const excluded = [".well-known", "favicon.ico", "api", "public"];
+    if (excluded.includes(username)) {
+      throw notFound(); // Langsung hentikan proses sebelum panggil DB
+    }
     const currUser = serverContext?.auth?.user;
     queryClient.setQueryData([authKeys.currentUser], currUser);
     const user = await queryClient.ensureQueryData(profile(username));
