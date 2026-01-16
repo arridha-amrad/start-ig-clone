@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { Session } from "@/lib/auth-client";
 import { redirect } from "@tanstack/react-router";
 import { createMiddleware } from "@tanstack/react-start";
 import {
@@ -17,7 +18,7 @@ const sessionLoookUp = async () => {
   if (setCookieHeader) {
     setResponseHeader("set-cookie", setCookieHeader);
   }
-  return session;
+  return session as Session;
 };
 
 export const requireAuthMiddleware = createMiddleware().server(

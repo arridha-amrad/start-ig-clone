@@ -34,6 +34,14 @@ export function countPostTotalLikes(postId: AnyColumn) {
   )`.as("total_likes");
 }
 
+export function countCommentTotalLikes(commentId: AnyColumn) {
+  return sql<number>`(
+    SELECT COUNT(*)
+    FROM "comment_like"
+    WHERE "comment_like"."comment_id" = ${commentId}
+  )`.as("total_likes");
+}
+
 export function countTotalReplies(commentId: AnyColumn) {
   return sql<number>`(
     SELECT COUNT(*)

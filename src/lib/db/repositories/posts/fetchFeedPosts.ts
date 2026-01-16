@@ -1,7 +1,7 @@
 import db from "../..";
 import { countPostTotalLikes, isPostLiked } from "../utils";
 
-export async function queryPosts(authUserId?: string) {
+export async function queryFeedPosts(authUserId?: string) {
   try {
     const posts = await db.query.post.findMany({
       limit: 10,

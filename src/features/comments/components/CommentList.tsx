@@ -1,11 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { comments } from "../../post/queries";
 import CommentCard from "@/components/CommentCard";
+import { comments } from "../queries";
 
 export default function Comments({ postId }: { postId: string }) {
   const { data: cmts } = useSuspenseQuery(comments(postId));
   return (
-    <div>
+    <div className="space-y-4">
       {cmts.map((cmt) => (
         <CommentCard key={cmt.id} comment={cmt} />
       ))}

@@ -1,5 +1,9 @@
 import db from "../..";
-import { countTotalReplies, isCommentLiked } from "../utils";
+import {
+  countTotalReplies,
+  isCommentLiked,
+  countCommentTotalLikes,
+} from "../utils";
 
 export async function fetchComments(postId: string, authUserId?: string) {
   try {
@@ -10,6 +14,7 @@ export async function fetchComments(postId: string, authUserId?: string) {
       extras: ({ id }) => ({
         isLiked: isCommentLiked(id, authUserId),
         totalReplies: countTotalReplies(id),
+        totalLikes: countCommentTotalLikes(id),
       }),
       with: {
         replies: {

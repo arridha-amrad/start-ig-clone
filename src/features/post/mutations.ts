@@ -1,11 +1,7 @@
-import { addComment, likePost } from "@/features/post/services";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { likePost } from "@/features/post/services";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postKeys } from "./queries";
-import { generateRandomString } from "better-auth/crypto";
-import { me } from "../auth/queries";
 import { TFeedPost } from "./types";
-import { TAddCommentSchema } from "@/lib/zod/post.schema";
-import { TComment } from "../comments/types";
 
 export const useLikePostMutation = (postId: string) => {
   const qc = useQueryClient();

@@ -3,7 +3,6 @@ import { useStore } from "@tanstack/react-form";
 import { useFieldContext, useFormContext } from "@/hooks/form-context";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button, Field, Input, Label } from "@headlessui/react";
-import { PasswordFieldForAuth, TextFieldForAuth } from "./Input";
 import { cn } from "@/utils";
 import { useId, useState } from "react";
 

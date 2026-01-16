@@ -1,9 +1,7 @@
-import { addComment as addCommentToPost } from "@/lib/db/repositories/comments/add";
-import { queryPosts } from "@/lib/db/repositories/posts/all";
-import { queryPostById } from "@/lib/db/repositories/posts/byId";
-import { queryUserPosts } from "@/lib/db/repositories/posts/byUserId";
-import { likePost as likeThisPost } from "@/lib/db/repositories/posts/like";
-import { addCommentSchema } from "@/lib/zod/post.schema";
+import { queryFeedPosts } from "@/lib/db/repositories/posts/fetchFeedPosts";
+import { queryPostDetail } from "@/lib/db/repositories/posts/fetchPostDetail";
+import { queryUserPosts } from "@/lib/db/repositories/posts/fetchUserPosts";
+import { likePost as likeThisPost } from "@/lib/db/repositories/posts/likePost";
 import {
   optionalAuthMiddleware,
   requireAuthMiddleware,
@@ -11,13 +9,6 @@ import {
 import { createServerFn } from "@tanstack/react-start";
 import { setTimeout } from "timers/promises";
 import { z } from "zod";
-
-export const addComment = createServerFn()
-  .inputValidator(addCommentSchema)
-  .middleware([requireAuthMiddleware])
-  .handler(async ({ data, context: { auth } }) => {
-    return addCommentToPost(data, auth.user.id);
-  });
 
 export const fetchPostDetail = createServerFn()
   .middleware([optionalAuthMiddleware])
@@ -27,8 +18,7 @@ export const fetchPostDetail = createServerFn()
     })
   )
   .handler(async ({ data: { postId }, context: { auth } }) => {
-    const authUserId = auth?.user?.id;
-    return queryPostById(postId, authUserId);
+    return queryPostDetail(postId, auth?.user?.id);
   });
 
 export const likePost = createServerFn({ method: "POST" })
@@ -47,7 +37,7 @@ export const fetchFeedPosts = createServerFn()
   .middleware([requireAuthMiddleware])
   .handler(async ({ context: { auth } }) => {
     const authUserId = auth.user.id;
-    return queryPosts(authUserId);
+    return queryFeedPosts(authUserId);
   });
 
 export const fetchUserPosts = createServerFn()

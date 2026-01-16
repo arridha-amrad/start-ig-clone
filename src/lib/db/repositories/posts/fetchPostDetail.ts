@@ -1,7 +1,7 @@
 import db from "../..";
 import { amIFollowingYou, countPostTotalLikes, isPostLiked } from "../utils";
 
-export async function queryPostById(postId: string, authUserId?: string) {
+export async function queryPostDetail(postId: string, authUserId?: string) {
   try {
     const post = await db.query.post.findFirst({
       where: (post, { eq }) => eq(post.id, postId),
