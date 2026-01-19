@@ -1,19 +1,24 @@
 import { TAddCommentSchema } from "@/lib/zod/post.schema";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { me } from "../auth/queries";
-import { postKeys } from "../post/queries";
-import { TComment, TReply } from "./types";
-import { addComment, likeComment } from "./service";
 import { commentKeys } from "./queries";
+import { addComment, likeComment } from "./service";
+import { TComment, TReply } from "./types";
 
-export const useLikeCommentMutation = (commentId: string, postId: string) => {
+export const useLikeCommentMutation = (
+  commentId: string,
+  postId: string,
+  isReply?: boolean
+) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => likeComment({ data: { commentId } }),
     onMutate: async () => {
+      if (isReply) {
+      }
       await qc.cancelQueries({ queryKey: commentKeys.comments(postId) });
       const prevComments = qc.getQueryData<TComment[]>(
-        commentKeys.comments(postId),
+        commentKeys.comments(postId)
       );
       qc.setQueryData(commentKeys.comments(postId), (old: TComment[]) => {
         return old.map((comment) =>
@@ -25,7 +30,7 @@ export const useLikeCommentMutation = (commentId: string, postId: string) => {
                 totalLikes: comment.isLiked
                   ? Number(comment.totalLikes) - 1
                   : Number(comment.totalLikes) + 1,
-              },
+              }
         );
       });
       return { prevComments };
@@ -45,7 +50,7 @@ export const useLikeCommentMutation = (commentId: string, postId: string) => {
 
 export const useAddCommentMutation = (
   postId: string,
-  parentCommentId?: string,
+  parentCommentId?: string
 ) => {
   const qc = useQueryClient();
   const { data: currUser } = useQuery(me);
@@ -81,7 +86,7 @@ export const useAddCommentMutation = (
                   ? [...comment.replies, newReply]
                   : comment.replies,
             }));
-          },
+          }
         );
         return;
       }
@@ -103,7 +108,7 @@ export const useAddCommentMutation = (
         (old: TComment[] | undefined) => {
           if (!old) return [newComment];
           return [newComment, ...old];
-        },
+        }
       );
     },
     onSettled: () => {

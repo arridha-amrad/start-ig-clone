@@ -29,8 +29,8 @@ const PostDetail = ({ id }: Props) => {
     <div
       style={{ height }}
       className={cn(
-        "flex w-full overflow-hidden rounded-xl",
-        height === 0 ? "" : "border border-foreground/20",
+        "flex w-full rounded-xl",
+        height === 0 ? "" : "border overflow-hidden border-foreground/20"
       )}
     >
       {/* LEFT SIDE: Image/Graphic Section */}
@@ -43,7 +43,7 @@ const PostDetail = ({ id }: Props) => {
 
       {/* RIGHT SIDE: Interactions & Comments */}
       <PostDetailProvider>
-        <div className="w-xs flex-none flex overflow-hidden flex-col">
+        <div style={{ height }} className="w-xs flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-foreground/20">
             <div className="flex items-center gap-3">
@@ -66,7 +66,7 @@ const PostDetail = ({ id }: Props) => {
           </div>
 
           {/* Scrollable Comments Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="w-full flex-1 flex-wrap overflow-y-auto p-4 space-y-4">
             {/* Main Caption */}
             <Comments postId={id} />
           </div>

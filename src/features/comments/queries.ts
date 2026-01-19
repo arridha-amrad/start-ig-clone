@@ -3,12 +3,19 @@ import { fetchComments } from "./service";
 
 export const commentKeys = {
   comments: (postId: string) => ["comments", "post", postId],
-  initReply: () => ["init-reply"],
+  replies: (commentId: string) => ["replies", "comment", commentId],
 };
 
 export const comments = (postId: string) =>
   queryOptions({
     queryKey: commentKeys.comments(postId),
     queryFn: () => fetchComments({ data: { postId } }),
+    staleTime: 60 * 60 * 1000,
+  });
+
+export const replies = (commentId: string) =>
+  queryOptions({
+    queryKey: commentKeys.replies(commentId),
+    // queryFn: () => fetchReplies({ data: { commentId } }),
     staleTime: 60 * 60 * 1000,
   });

@@ -8,6 +8,18 @@ import z from "zod";
 import { likeComment as likeC } from "@/lib/db/repositories/comments/like";
 import { addCommentSchema } from "@/lib/zod/post.schema";
 import { createComment } from "@/lib/db/repositories/comments/createComment";
+import { fetchReplies as queryReplies } from "@/lib/db/repositories/comments/fetchReplies";
+
+export const fetchReplies = createServerFn()
+  .inputValidator(
+    z.object({
+      commentId: z.string(),
+    })
+  )
+  .middleware([optionalAuthMiddleware])
+  .handler(async ({ data: { commentId }, context: { auth } }) => {
+    return queryReplies(commentId, auth?.user.id);
+  });
 
 export const addComment = createServerFn()
   .inputValidator(addCommentSchema)
