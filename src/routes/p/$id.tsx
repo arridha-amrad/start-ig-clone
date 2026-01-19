@@ -1,5 +1,6 @@
+import { comments } from "@/features/comments/queries";
 import PostDetail from "@/features/post/components/PostDetail";
-import { comments, postDetail } from "@/features/post/queries";
+import { postDetail } from "@/features/post/queries";
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
 

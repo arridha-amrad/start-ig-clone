@@ -3,6 +3,7 @@ import { fetchComments } from "./service";
 
 export const commentKeys = {
   comments: (postId: string) => ["comments", "post", postId],
+  initReply: () => ["init-reply"],
 };
 
 export const comments = (postId: string) =>

@@ -19,6 +19,7 @@ import {
   FormEvent,
   RefObject,
   SetStateAction,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -26,13 +27,32 @@ import { addCommentSchema } from "@/lib/zod/post.schema";
 import z from "zod";
 import toast from "react-hot-toast";
 import { useAddCommentMutation } from "../mutations";
+import { useQuery } from "@tanstack/react-query";
+import { commentKeys } from "../queries";
 
 type Props = {
   postId: string;
   ref: React.RefObject<HTMLInputElement | null>;
 };
 
+interface ReplyState {
+  username: string;
+  commentId: string;
+}
+
 export default function FormComment({ ref, postId }: Props) {
+  const { data: replyState } = useQuery<ReplyState>({
+    queryKey: commentKeys.initReply(),
+    staleTime: Infinity,
+    enabled: false,
+  });
+  useEffect(() => {
+    if (replyState?.commentId) {
+      setBody(`@${replyState.username} `);
+      inputRef.current?.focus();
+    }
+  }, [replyState?.commentId]);
+
   const { mutateAsync, isPending } = useAddCommentMutation(postId);
 
   const [body, setBody] = useState("");

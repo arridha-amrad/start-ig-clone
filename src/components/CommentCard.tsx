@@ -1,13 +1,22 @@
 import { CommentButtonLike } from "@/features/comments/components/ButtonLike";
+import { commentKeys } from "@/features/comments/queries";
 import { TComment } from "@/features/comments/types";
 import { formatShorthand } from "@/utils";
 import { Button } from "@headlessui/react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   comment: TComment;
 };
 
 export default function CommentCard({ comment }: Props) {
+  const qc = useQueryClient();
+  const initReply = () => {
+    qc.setQueryData(commentKeys.initReply(), {
+      username: comment.user.username,
+      commentId: comment.id,
+    });
+  };
   return (
     <div className="flex gap-4">
       {/* AVATAR */}
@@ -25,14 +34,20 @@ export default function CommentCard({ comment }: Props) {
             {comment.content}
           </div>
           <div className="flex-none">
-            <CommentButtonLike commentId={comment.id} />
+            <CommentButtonLike commentId={comment.id} postId={comment.postId} />
           </div>
         </div>
         <div className="flex gap-x-4 text-xs text-foreground/50 font-medium">
           <span>{formatShorthand(comment.createdAt)}</span>
-          <span>2 likes</span>
+          {comment.totalLikes > 0 && (
+            <span>
+              {comment.totalLikes} {comment.totalLikes === 1 ? "like" : "likes"}
+            </span>
+          )}
           <div className="flex-none">
-            <Button className="">Reply</Button>
+            <Button onClick={initReply} className="">
+              Reply
+            </Button>
           </div>
         </div>
       </div>
