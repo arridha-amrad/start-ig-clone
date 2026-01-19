@@ -123,7 +123,7 @@ const SidebarLink = ({ href, icon, label }: Props) => {
     <Link
       className={cn(
         "flex items-center text-xl p-1.5 hover:bg-foreground/10 gap-2 lg:pr-4 w-max rounded-xl",
-        isActive && "bg-foreground/10"
+        isActive && "bg-foreground/10",
       )}
       preload={false}
       to={href}
@@ -200,7 +200,7 @@ function MoreOptions() {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 10, opacity: 0 }}
                 className={cn(
-                  "bg-skin-elevated-separator w-max space-y-2 overflow-hidden rounded-lg p-2 drop-shadow-sm"
+                  "bg-skin-elevated-separator w-max space-y-2 overflow-hidden rounded-lg p-2 drop-shadow-sm",
                 )}
               >
                 {openTheme ? (

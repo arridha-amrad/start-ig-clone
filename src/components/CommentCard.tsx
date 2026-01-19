@@ -1,20 +1,21 @@
 import { CommentButtonLike } from "@/features/comments/components/ButtonLike";
-import { commentKeys } from "@/features/comments/queries";
 import { TComment } from "@/features/comments/types";
 import { formatShorthand } from "@/utils";
 import { Button } from "@headlessui/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { usePostDetailContext } from "./PostDetailProvider";
 
 type Props = {
   comment: TComment;
 };
 
 export default function CommentCard({ comment }: Props) {
-  const qc = useQueryClient();
+  const { setReplyState } = usePostDetailContext();
+
   const initReply = () => {
-    qc.setQueryData(commentKeys.initReply(), {
-      username: comment.user.username,
-      commentId: comment.id,
+    setReplyState({
+      parentCommentId: comment.id,
+      toUserId: comment.userId,
+      toUsername: comment.user.username,
     });
   };
   return (

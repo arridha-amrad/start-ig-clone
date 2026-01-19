@@ -4,7 +4,7 @@ import * as schema from "../../schema";
 
 export async function createComment(
   data: TAddCommentSchema,
-  authUserId: string
+  authUserId: string,
 ) {
   const { body, postId, parentCommentId } = data;
   const result = await db

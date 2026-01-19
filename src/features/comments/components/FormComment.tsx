@@ -1,6 +1,8 @@
 import EmojiPicker from "@/components/EmojiPicker";
+import { usePostDetailContext } from "@/components/PostDetailProvider";
 import useClickOutside from "@/hooks/useClickOutside";
 import useEscapePressed from "@/hooks/useEscPress";
+import { addCommentSchema } from "@/lib/zod/post.schema";
 import { cn } from "@/utils";
 import {
   autoUpdate,
@@ -23,37 +25,29 @@ import {
   useRef,
   useState,
 } from "react";
-import { addCommentSchema } from "@/lib/zod/post.schema";
-import z from "zod";
 import toast from "react-hot-toast";
+import z from "zod";
 import { useAddCommentMutation } from "../mutations";
-import { useQuery } from "@tanstack/react-query";
-import { commentKeys } from "../queries";
 
 type Props = {
   postId: string;
   ref: React.RefObject<HTMLInputElement | null>;
 };
 
-interface ReplyState {
-  username: string;
-  commentId: string;
-}
-
 export default function FormComment({ ref, postId }: Props) {
-  const { data: replyState } = useQuery<ReplyState>({
-    queryKey: commentKeys.initReply(),
-    staleTime: Infinity,
-    enabled: false,
-  });
+  const { replyState, setReplyState } = usePostDetailContext();
+
   useEffect(() => {
-    if (replyState?.commentId) {
-      setBody(`@${replyState.username} `);
+    if (replyState?.parentCommentId) {
+      setBody(`@${replyState.toUsername} `);
       inputRef.current?.focus();
     }
-  }, [replyState?.commentId]);
+  }, [replyState?.parentCommentId]);
 
-  const { mutateAsync, isPending } = useAddCommentMutation(postId);
+  const { mutateAsync, isPending } = useAddCommentMutation(
+    postId,
+    replyState?.parentCommentId,
+  );
 
   const [body, setBody] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,10 +75,18 @@ export default function FormComment({ ref, postId }: Props) {
       return;
     }
     try {
-      await mutateAsync({ body: validation.data.body, postId });
+      await mutateAsync({
+        body: validation.data.body,
+        postId,
+        parentCommentId: replyState?.parentCommentId,
+      });
       setBody("");
       cursorPositionRef.current = 0;
-    } catch (err) {}
+      setReplyState(null);
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong");
+    }
   };
 
   return (
@@ -114,7 +116,7 @@ export default function FormComment({ ref, postId }: Props) {
         type="submit"
         className={cn(
           "font-medium text-sm",
-          !!body ? "text-blue-500" : "text-foreground/50"
+          !!body ? "text-blue-500" : "text-foreground/50",
         )}
       >
         {isPending ? (

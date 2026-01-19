@@ -45,8 +45,8 @@ export function countCommentTotalLikes(commentId: AnyColumn) {
 export function countTotalReplies(commentId: AnyColumn) {
   return sql<number>`(
     SELECT COUNT(*)
-    FROM "comments"
-    WHERE "comments"."parent_id" = ${commentId}
+    FROM "comments" AS "replies"
+    WHERE "replies"."parent_id" = ${commentId}
   )`.as("total_replies");
 }
 

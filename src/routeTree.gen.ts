@@ -114,6 +114,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/$username': typeof UsernameRouteRouteWithChildren
+  '/': typeof MustAuthIndexRoute
   '/p': typeof PRouteRouteWithChildren
   '/settings': typeof SettingsRouteRouteWithChildren
   '/$username/saved': typeof UsernameSavedRoute
@@ -126,7 +127,6 @@ export interface FileRoutesByFullPath {
   '/p/$id': typeof PIdRoute
   '/settings/notification': typeof SettingsNotificationRoute
   '/$username/': typeof UsernameIndexRoute
-  '/': typeof MustAuthIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -170,6 +170,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/$username'
+    | '/'
     | '/p'
     | '/settings'
     | '/$username/saved'
@@ -182,7 +183,6 @@ export interface FileRouteTypes {
     | '/p/$id'
     | '/settings/notification'
     | '/$username/'
-    | '/'
     | '/settings/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
@@ -252,7 +252,7 @@ declare module '@tanstack/react-router' {
     '/_mustAuth': {
       id: '/_mustAuth'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof MustAuthRouteRouteImport
       parentRoute: typeof rootRouteImport
     }

@@ -2,7 +2,7 @@ import { TAddCommentSchema } from "@/lib/zod/post.schema";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { me } from "../auth/queries";
 import { postKeys } from "../post/queries";
-import { TComment } from "./types";
+import { TComment, TReply } from "./types";
 import { addComment, likeComment } from "./service";
 import { commentKeys } from "./queries";
 
@@ -13,7 +13,7 @@ export const useLikeCommentMutation = (commentId: string, postId: string) => {
     onMutate: async () => {
       await qc.cancelQueries({ queryKey: commentKeys.comments(postId) });
       const prevComments = qc.getQueryData<TComment[]>(
-        commentKeys.comments(postId)
+        commentKeys.comments(postId),
       );
       qc.setQueryData(commentKeys.comments(postId), (old: TComment[]) => {
         return old.map((comment) =>
@@ -25,7 +25,7 @@ export const useLikeCommentMutation = (commentId: string, postId: string) => {
                 totalLikes: comment.isLiked
                   ? Number(comment.totalLikes) - 1
                   : Number(comment.totalLikes) + 1,
-              }
+              },
         );
       });
       return { prevComments };
@@ -43,13 +43,48 @@ export const useLikeCommentMutation = (commentId: string, postId: string) => {
   });
 };
 
-export const useAddCommentMutation = (postId: string) => {
+export const useAddCommentMutation = (
+  postId: string,
+  parentCommentId?: string,
+) => {
   const qc = useQueryClient();
   const { data: currUser } = useQuery(me);
   return useMutation({
     mutationFn: (data: TAddCommentSchema) => addComment({ data }),
     onSuccess: (data) => {
       if (!currUser) return;
+      if (parentCommentId) {
+        // reply
+        const newReply: TReply = {
+          ...data,
+          isLiked: false,
+          totalLikes: 0,
+          user: {
+            id: currUser.id,
+            image: currUser.image ?? null,
+            name: currUser.name,
+            username: currUser.username,
+          },
+        };
+        qc.setQueryData(
+          commentKeys.comments(postId),
+          (old: TComment[] | undefined) => {
+            if (!old) return [newReply];
+            return old.map((comment) => ({
+              ...comment,
+              totalReplies:
+                comment.id === parentCommentId
+                  ? Number(comment.totalReplies) + 1
+                  : comment.totalReplies,
+              replies:
+                comment.id === parentCommentId
+                  ? [...comment.replies, newReply]
+                  : comment.replies,
+            }));
+          },
+        );
+        return;
+      }
       const newComment: TComment = {
         ...data,
         isLiked: false,
@@ -64,16 +99,16 @@ export const useAddCommentMutation = (postId: string) => {
         },
       };
       qc.setQueryData(
-        postKeys.comments(postId),
+        commentKeys.comments(postId),
         (old: TComment[] | undefined) => {
           if (!old) return [newComment];
           return [newComment, ...old];
-        }
+        },
       );
     },
     onSettled: () => {
       qc.invalidateQueries({
-        queryKey: postKeys.comments(postId),
+        queryKey: commentKeys.comments(postId),
         refetchType: "none",
       });
     },

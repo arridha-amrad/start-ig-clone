@@ -8,7 +8,8 @@ import {
 export async function fetchComments(postId: string, authUserId?: string) {
   try {
     const result = await db.query.comments.findMany({
-      where: ({ postId: pId }, { eq }) => eq(pId, postId),
+      where: ({ postId: pId, parentId }, { eq, and, isNull }) =>
+        and(eq(pId, postId), isNull(parentId)),
       limit: 10,
       orderBy: ({ createdAt }, { desc }) => desc(createdAt),
       extras: ({ id }) => ({
@@ -18,6 +19,10 @@ export async function fetchComments(postId: string, authUserId?: string) {
       }),
       with: {
         replies: {
+          extras: ({ id }) => ({
+            isLiked: isCommentLiked(id, authUserId),
+            totalLikes: countCommentTotalLikes(id),
+          }),
           with: {
             user: {
               columns: {
