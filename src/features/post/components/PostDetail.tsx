@@ -30,7 +30,7 @@ const PostDetail = ({ id }: Props) => {
       style={{ height }}
       className={cn(
         "flex w-full rounded-xl",
-        height === 0 ? "" : "border overflow-hidden border-foreground/20"
+        height === 0 ? "" : "border overflow-hidden border-foreground/20",
       )}
     >
       {/* LEFT SIDE: Image/Graphic Section */}
@@ -76,7 +76,7 @@ const PostDetail = ({ id }: Props) => {
             <div className="flex justify-between mb-2">
               <div className="flex gap-4">
                 {/* <Heart className="w-6 h-6 hover:text-gray-600 cursor-pointer" /> */}
-                <PostDetailLikeButton />
+                <PostDetailLikeButton post={post} />
                 <MessageCircle
                   onClick={() => formCommentInputRef.current?.focus()}
                   className="w-6 h-6 hover:text-gray-600 cursor-pointer"

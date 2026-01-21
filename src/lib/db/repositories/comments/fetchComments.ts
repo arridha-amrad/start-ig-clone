@@ -18,22 +18,6 @@ export async function fetchComments(postId: string, authUserId?: string) {
         totalLikes: countCommentTotalLikes(id),
       }),
       with: {
-        replies: {
-          extras: ({ id }) => ({
-            isLiked: isCommentLiked(id, authUserId),
-            totalLikes: countCommentTotalLikes(id),
-          }),
-          with: {
-            user: {
-              columns: {
-                id: true,
-                username: true,
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
         user: {
           columns: {
             id: true,

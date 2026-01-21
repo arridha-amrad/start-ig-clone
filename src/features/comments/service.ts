@@ -14,7 +14,7 @@ export const fetchReplies = createServerFn()
   .inputValidator(
     z.object({
       commentId: z.string(),
-    })
+    }),
   )
   .middleware([optionalAuthMiddleware])
   .handler(async ({ data: { commentId }, context: { auth } }) => {
@@ -32,7 +32,7 @@ export const fetchComments = createServerFn()
   .inputValidator(
     z.object({
       postId: z.string(),
-    })
+    }),
   )
   .middleware([optionalAuthMiddleware])
   .handler(async ({ data: { postId }, context: { auth } }) => {
@@ -44,7 +44,7 @@ export const likeComment = createServerFn()
   .inputValidator(
     z.object({
       commentId: z.string(),
-    })
+    }),
   )
   .middleware([requireAuthMiddleware])
   .handler(async ({ data: { commentId }, context: { auth } }) => {

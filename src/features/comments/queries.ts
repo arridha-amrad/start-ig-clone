@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { fetchComments } from "./service";
+import { fetchComments, fetchReplies } from "./service";
 
 export const commentKeys = {
   comments: (postId: string) => ["comments", "post", postId],
@@ -16,6 +16,6 @@ export const comments = (postId: string) =>
 export const replies = (commentId: string) =>
   queryOptions({
     queryKey: commentKeys.replies(commentId),
-    // queryFn: () => fetchReplies({ data: { commentId } }),
+    queryFn: () => fetchReplies({ data: { commentId } }),
     staleTime: 60 * 60 * 1000,
   });

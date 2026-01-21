@@ -1,8 +1,8 @@
 import { cn } from "@/utils";
 import { Heart } from "lucide-react";
 import { useLikePostMutation } from "../mutations";
-import { TFeedPost } from "../services";
 import { Button } from "@headlessui/react";
+import { TFeedPost, TPostDetail } from "../types";
 
 export function FeedPostLikeButton({ post }: { post: TFeedPost }) {
   const { mutate } = useLikePostMutation(post.id);
@@ -14,7 +14,7 @@ export function FeedPostLikeButton({ post }: { post: TFeedPost }) {
           "size-6 cursor-pointer transition-colors",
           post.isLiked
             ? "fill-rose-500 text-rose-500"
-            : "hover:text-foreground/80"
+            : "hover:text-foreground/80",
         )}
       />
       {post.totalLikes > 0 && (
@@ -24,13 +24,15 @@ export function FeedPostLikeButton({ post }: { post: TFeedPost }) {
   );
 }
 
-export function PostDetailLikeButton() {
+export function PostDetailLikeButton({ post }: { post: TPostDetail }) {
   return (
     <div className="flex items-center gap-x-2">
       <Heart
         className={cn(
           "size-6 cursor-pointer transition-colors",
-          true ? "fill-rose-500 text-rose-500" : "hover:text-foreground/80"
+          post.isLiked
+            ? "fill-rose-500 text-rose-500"
+            : "hover:text-foreground/80",
         )}
       />
     </div>

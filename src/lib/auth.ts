@@ -4,6 +4,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { verifyUser } from "./db/repositories/users/afterVerification";
 import { sendEmail } from "./mailer";
+import { env } from "@/env";
 
 export const auth = betterAuth({
   session: {
@@ -42,6 +43,33 @@ export const auth = betterAuth({
         required: true,
         input: true,
       },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          if (!user.username) {
+            const baseUsername = user.email.split("@")[0];
+            const randomSuffix = Math.floor(Math.random() * 1000);
+            return {
+              data: {
+                ...user,
+                username: `${baseUsername}${randomSuffix}`,
+              },
+            };
+          }
+          return { data: user };
+        },
+      },
+    },
+  },
+  socialProviders: {
+    google: {
+      enabled: true,
+      prompt: "select_account",
+      clientId: env.googleClientId!,
+      clientSecret: env.googleClientSecret!,
     },
   },
 });

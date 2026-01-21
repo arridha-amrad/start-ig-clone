@@ -7,7 +7,7 @@ import {
   setResponseHeader,
 } from "@tanstack/react-start/server";
 
-const sessionLoookUp = async () => {
+const sessionLookUp = async () => {
   const headers = getRequestHeaders();
   const sessionResponse = await auth.api.getSession({
     headers,
@@ -24,7 +24,7 @@ const sessionLoookUp = async () => {
 export const requireAuthMiddleware = createMiddleware().server(
   async ({ next }) => {
     try {
-      const session = await sessionLoookUp();
+      const session = await sessionLookUp();
       if (!session) {
         throw new Error("session not found");
       }
@@ -34,24 +34,28 @@ export const requireAuthMiddleware = createMiddleware().server(
         },
       });
     } catch (error) {
-      console.log("---require auth middleware err", error);
+      if (error instanceof Error) {
+        console.log("---require auth middleware err", error.message);
+      }
       throw redirect({ to: "/auth/login" });
     }
-  }
+  },
 );
 
 export const optionalAuthMiddleware = createMiddleware().server(
   async ({ next }) => {
     try {
-      const session = await sessionLoookUp();
+      const session = await sessionLookUp();
       return next({
         context: {
           auth: session,
         },
       });
     } catch (err) {
-      console.log("---optional auth middleware err", err);
+      if (err instanceof Error) {
+        console.log("---optional auth middleware err", err.message);
+      }
       throw redirect({ to: "/auth/login" });
     }
-  }
+  },
 );

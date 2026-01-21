@@ -15,7 +15,7 @@ export const fetchPostDetail = createServerFn()
   .inputValidator(
     z.object({
       postId: z.string(),
-    })
+    }),
   )
   .handler(async ({ data: { postId }, context: { auth } }) => {
     return queryPostDetail(postId, auth?.user?.id);
@@ -25,7 +25,7 @@ export const likePost = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
       postId: z.string(),
-    })
+    }),
   )
   .middleware([requireAuthMiddleware])
   .handler(async ({ context: { auth }, data: { postId } }) => {
@@ -44,7 +44,7 @@ export const fetchUserPosts = createServerFn()
   .inputValidator(
     z.object({
       userId: z.string(),
-    })
+    }),
   )
   .handler(async ({ data: { userId } }) => {
     return queryUserPosts(userId);
