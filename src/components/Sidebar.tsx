@@ -1,5 +1,5 @@
+import { ButtonLogout } from "@/features/auth/components/ButtonLogout";
 import { setThemeServerFn } from "@/features/theme";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/utils";
 import {
   autoUpdate,
@@ -12,8 +12,7 @@ import {
   useRole,
 } from "@floating-ui/react";
 import { Button } from "@headlessui/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   ActivityIcon,
   BellIcon,
@@ -43,7 +42,6 @@ import {
 import DialogLogout from "./DialogLogout";
 import MySwitch from "./Switch";
 import { InstagramIcon, InstagramText } from "./svg/Instagram";
-import { ButtonLogout } from "@/features/auth/components/ButtonLogout";
 
 type SidebarProps = {
   username: string;
@@ -85,9 +83,10 @@ export const Sidebar = ({ username }: SidebarProps) => {
           label="Notifications"
         />
         <SidebarLink
-          href={`/${username}`}
+          href="/$username"
           icon={<UserRound className="size-6" />}
           label="Profile"
+          params={{ username }}
         />
         <ButtonCreatePost />
       </div>
@@ -115,23 +114,21 @@ type Props = {
   href: string;
   icon: React.ReactNode;
   label: string;
+  params?: Record<string, string>;
 };
-const SidebarLink = ({ href, icon, label }: Props) => {
-  const pathname = useLocation().pathname;
-  const isActive = pathname === href;
+const SidebarLink = ({ href, icon, label, params }: Props) => {
   return (
     <Link
       className={cn(
         "flex items-center text-xl p-1.5 hover:bg-foreground/10 gap-2 lg:pr-4 w-max rounded-xl",
-        isActive && "bg-foreground/10",
       )}
+      activeProps={{ className: "font-medium bg-foreground/10" }}
       preload={false}
-      to={href}
+      to={label === "Profile" ? "/$username" : href}
+      params={params}
     >
       <div className="p-2">{icon}</div>
-      <span className={cn(isActive && "font-bold", "lg:block hidden")}>
-        {label}
-      </span>
+      <span className={cn("lg:block hidden")}>{label}</span>
     </Link>
   );
 };

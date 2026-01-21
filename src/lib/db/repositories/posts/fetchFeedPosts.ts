@@ -1,5 +1,5 @@
 import db from "../..";
-import { countPostTotalLikes, isPostLiked } from "../utils";
+import { countPostTotalLikes, countTotalComments, isPostLiked } from "../utils";
 
 export async function queryFeedPosts(authUserId?: string) {
   try {
@@ -20,6 +20,7 @@ export async function queryFeedPosts(authUserId?: string) {
       extras: ({ id }) => ({
         totalLikes: countPostTotalLikes(id),
         isLiked: isPostLiked(id, authUserId),
+        totalComments: countTotalComments(id),
       }),
     });
     return posts;

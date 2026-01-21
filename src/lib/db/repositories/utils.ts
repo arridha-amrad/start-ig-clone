@@ -1,5 +1,13 @@
 import { AnyColumn, sql } from "drizzle-orm";
 
+export function countTotalComments(postId: AnyColumn) {
+  return sql<number>`(
+    SELECT COUNT(*)
+    FROM "comments"
+    WHERE "comments"."post_id" = ${postId}
+  )`.as("total_comments");
+}
+
 export function isPostLiked(postId: AnyColumn, authUserId?: string) {
   return !!authUserId
     ? sql<boolean>`(

@@ -74,7 +74,7 @@ const PostDetail = ({ id }: Props) => {
           {/* Footer Actions */}
           <div className="p-4 border-t border-foreground/20">
             <div className="flex justify-between mb-2">
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 {/* <Heart className="w-6 h-6 hover:text-gray-600 cursor-pointer" /> */}
                 <PostDetailLikeButton post={post} />
                 <MessageCircle
@@ -85,7 +85,10 @@ const PostDetail = ({ id }: Props) => {
               </div>
               <Bookmark className="w-6 h-6 hover:text-gray-600 cursor-pointer" />
             </div>
-            <div className="font-semibold text-sm">73,166 likes</div>
+
+            <div className="font-semibold text-sm">
+              {post.totalLikes} {post.totalLikes === 1 ? "like" : "likes"}
+            </div>
             <div className="text-foreground/50 text-[10px] uppercase mt-1">
               {formatDistanceToNowStrict(post.createdAt, { addSuffix: true })}
             </div>

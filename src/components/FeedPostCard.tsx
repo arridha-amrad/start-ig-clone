@@ -80,12 +80,7 @@ function Caption({ post }: { post: TFeedPost }) {
     <div className="space-y-1">
       <div className="text-sm">
         <span className="font-semibold mr-2">{post.owner.username}</span>
-        <span className="text-gray-200">
-          {post.caption} Lorem ipsum dolor sit amet, consectetur adipisicing
-          elit. Praesentium incidunt adipisci accusantium illum quae, laboriosam
-          sapiente obcaecati ab optio corporis. Et temporibus consequuntur nulla
-          eligendi!
-        </span>
+        <span className="text-gray-200">{post.caption}</span>
       </div>
     </div>
   );
@@ -99,7 +94,7 @@ function Comment({ post }: { post: TFeedPost }) {
         onClick={() => navigate({ to: "/p/$id", params: { id: post.id } })}
         className="size-6 cursor-pointer"
       />
-      {/* <p className="text-sm">{post.totalComments as string}</p> */}
+      <p className="text-sm">{post.totalComments}</p>
     </div>
   );
 }
@@ -158,32 +153,37 @@ function Carousel({ post }: { post: TFeedPost }) {
           ))}
         </div>
       </div>
-      <div className="absolute group-hover:opacity-100 transition-opacity duration-150 ease-in opacity-0 left-4 top-1/2 -translate-y-1/2">
-        <Button
-          onClick={() => emblaApi?.scrollPrev()}
-          className="size-max p-1 rounded-full bg-background/50"
-        >
-          <ChevronLeft className="w-5 h-5 text-foreground cursor-pointer" />
-        </Button>
-      </div>
-      <div className="absolute group-hover:opacity-100 transition-opacity duration-150 ease-in opacity-0 right-4 top-1/2 -translate-y-1/2">
-        <Button
-          onClick={() => emblaApi?.scrollNext()}
-          className="size-max p-1 rounded-full bg-background/50"
-        >
-          <ChevronRight className="w-5 h-5 text-foreground cursor-pointer" />
-        </Button>
-      </div>
-      <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center justify-center gap-1">
-        {scrollSnaps.map((_, i) => (
-          <div
-            key={i}
-            className={`${
-              i === selectedIndex ? "bg-foreground" : "bg-foreground/50"
-            } size-2 rounded-full`}
-          />
-        ))}
-      </div>
+
+      {post.media.length > 1 && (
+        <>
+          <div className="absolute group-hover:opacity-100 transition-opacity duration-150 ease-in opacity-0 left-4 top-1/2 -translate-y-1/2">
+            <Button
+              onClick={() => emblaApi?.scrollPrev()}
+              className="size-max p-1 rounded-full bg-background/50"
+            >
+              <ChevronLeft className="w-5 h-5 text-foreground cursor-pointer" />
+            </Button>
+          </div>
+          <div className="absolute group-hover:opacity-100 transition-opacity duration-150 ease-in opacity-0 right-4 top-1/2 -translate-y-1/2">
+            <Button
+              onClick={() => emblaApi?.scrollNext()}
+              className="size-max p-1 rounded-full bg-background/50"
+            >
+              <ChevronRight className="w-5 h-5 text-foreground cursor-pointer" />
+            </Button>
+          </div>
+          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center justify-center gap-1">
+            {scrollSnaps.map((_, i) => (
+              <div
+                key={i}
+                className={`${
+                  i === selectedIndex ? "bg-foreground" : "bg-foreground/50"
+                } size-2 rounded-full`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

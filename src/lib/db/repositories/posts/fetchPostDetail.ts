@@ -1,5 +1,10 @@
 import db from "../..";
-import { amIFollowingYou, countPostTotalLikes, isPostLiked } from "../utils";
+import {
+  amIFollowingYou,
+  countPostTotalLikes,
+  countTotalComments,
+  isPostLiked,
+} from "../utils";
 
 export async function queryPostDetail(postId: string, authUserId?: string) {
   try {
@@ -22,6 +27,7 @@ export async function queryPostDetail(postId: string, authUserId?: string) {
       extras: ({ id }) => ({
         totalLikes: countPostTotalLikes(id),
         isLiked: isPostLiked(id, authUserId),
+        totalComments: countTotalComments(id),
       }),
     });
     if (!post) {
@@ -34,31 +40,3 @@ export async function queryPostDetail(postId: string, authUserId?: string) {
     throw new Error("Something went wrong");
   }
 }
-
-// comments: {
-//   orderBy: (fields, { desc }) => desc(fields.createdAt),
-//   with: {
-//     replies: {
-//       orderBy: ({ createdAt }, { asc }) => asc(createdAt),
-//       limit: 5,
-//       with: {
-//         user: {
-//           columns: {
-//             id: true,
-//             username: true,
-//             image: true,
-//             name: true,
-//           },
-//         },
-//       },
-//     },
-//     user: {
-//       columns: {
-//         id: true,
-//         username: true,
-//         image: true,
-//         name: true,
-//       },
-//     },
-//   },
-// },

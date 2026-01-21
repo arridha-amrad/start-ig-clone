@@ -3,7 +3,7 @@ import { amIFollowingYou } from "../utils";
 
 export async function queryUserByUsernameWithInfo(
   username: string,
-  authUserId?: string
+  authUserId?: string,
 ) {
   console.log({ username });
 
@@ -17,15 +17,15 @@ export async function queryUserByUsernameWithInfo(
         isFollowing: amIFollowingYou(id, authUserId),
         totalPosts:
           sql<number>`(select count("post"."id") from "post" where "post"."user_id" = "user"."id")`.as(
-            "total_posts"
+            "total_posts",
           ),
         totalFollowers:
           sql<number>`(select count("follows"."follower_id") from "follows" where "follows"."following_id" = "user"."id")`.as(
-            "total_followers"
+            "total_followers",
           ),
         totalFollowing:
           sql<number>`(select count("follows"."following_id") from "follows" where "follows"."follower_id" = "user"."id")`.as(
-            "total_following"
+            "total_following",
           ),
       }),
     });
