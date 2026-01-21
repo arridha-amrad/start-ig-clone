@@ -31,7 +31,7 @@ export function PostAvatar({ url }: { url?: string | null }) {
           "flex flex-none items-center justify-center rounded-full p-0.5",
           hasStory
             ? "bg-linear-to-tr from-yellow-400 via-red-500 to-purple-600"
-            : "bg-gray-300"
+            : "bg-gray-300",
         )}
       >
         {/* Inner Gap (Black) */}

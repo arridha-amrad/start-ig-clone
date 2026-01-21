@@ -3,6 +3,8 @@ import db from "../..";
 import * as schema from "../../schema";
 
 export async function likePost(postId: string, authUserId: string) {
+  console.log("ready to like..");
+
   try {
     return await db.transaction(async (tx) => {
       const existingLike = await tx.query.postLike.findFirst({
@@ -15,8 +17,8 @@ export async function likePost(postId: string, authUserId: string) {
           .where(
             and(
               eq(schema.postLike.postId, postId),
-              eq(schema.postLike.userId, authUserId)
-            )
+              eq(schema.postLike.userId, authUserId),
+            ),
           );
         return { liked: false };
       }

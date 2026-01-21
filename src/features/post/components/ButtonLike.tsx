@@ -1,7 +1,6 @@
 import { cn } from "@/utils";
 import { Heart } from "lucide-react";
 import { useLikePostMutation } from "../mutations";
-import { Button } from "@headlessui/react";
 import { TFeedPost, TPostDetail } from "../types";
 
 export function FeedPostLikeButton({ post }: { post: TFeedPost }) {
@@ -25,9 +24,11 @@ export function FeedPostLikeButton({ post }: { post: TFeedPost }) {
 }
 
 export function PostDetailLikeButton({ post }: { post: TPostDetail }) {
+  const { mutate } = useLikePostMutation(post.id);
   return (
     <div className="flex items-center gap-x-2">
       <Heart
+        onClick={() => mutate()}
         className={cn(
           "size-6 cursor-pointer transition-colors",
           post.isLiked
@@ -36,13 +37,5 @@ export function PostDetailLikeButton({ post }: { post: TPostDetail }) {
         )}
       />
     </div>
-  );
-}
-
-export function CommentLikeButton() {
-  return (
-    <Button>
-      <Heart className="size-4" />
-    </Button>
   );
 }

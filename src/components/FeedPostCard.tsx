@@ -1,4 +1,3 @@
-import { TFeedPost } from "@/features/post/services";
 import { cn } from "@/utils";
 import {
   Bookmark,
@@ -17,6 +16,7 @@ import { formatDistanceToNowStrict } from "date-fns";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@headlessui/react";
 import { PostAvatar } from "./Avatar";
+import { TFeedPost } from "@/features/post/types";
 
 type Props = {
   post: TFeedPost;
@@ -129,7 +129,7 @@ function Carousel({ post }: { post: TFeedPost }) {
       <div
         className={cn(
           "overflow-hidden rounded-lg",
-          `aspect-[${post.aspectRatio}]`
+          `aspect-[${post.aspectRatio}]`,
         )}
         ref={emblaRef}
       >
@@ -138,7 +138,7 @@ function Carousel({ post }: { post: TFeedPost }) {
             <div
               className={cn(
                 "w-full overflow-hidden",
-                `aspect-[${post.aspectRatio}]`
+                `aspect-[${post.aspectRatio}]`,
               )}
               style={{
                 aspectRatio: post.aspectRatio,
